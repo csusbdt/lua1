@@ -15,6 +15,12 @@ static int msgbox(lua_State * L) {
 	return 0;
 }
 
+static int render_clear(lua_State * L) {
+	//SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+	SDL_RenderClear(renderer);
+	return 0;
+}
+
 static int set_draw_color(lua_State * L) {
 	int r, g, b, a;
 
@@ -121,7 +127,8 @@ void register_util_functions(lua_State * L) {
 	lua_register(L, "set_draw_color" , set_draw_color );
 	lua_register(L, "draw_line"      , draw_line      );
 	lua_register(L, "read_file"      , read_file      );
+	lua_register(L, "render_present" , render_present );
+	lua_register(L, "render_clear"   , render_clear   );
 	lua_register(L, "write_file"     , write_file     );
 	lua_register(L, "load_chunk"     , load_chunk     );
-	lua_register(L, "render_present" , render_present );
 }

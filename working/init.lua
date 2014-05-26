@@ -87,5 +87,6 @@ assert(err)
 
 function on_touch(x, y)
 	print('x = ' .. x .. '  y = ' .. y)
+	render_present()
 end
 
