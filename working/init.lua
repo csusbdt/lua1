@@ -1,3 +1,21 @@
+-- Test fonts.
+
+local font1, err = open_font('fonts/I_dont_exist.ttf')
+assert(not font1)
+assert(err and type(err) == 'string')
+
+font1, err = open_font('fonts/I_dont_exist.ttf', 24)
+assert(not font1)
+assert(err and type(err) == 'string')
+
+font1, err = open_font(24, 'fonts/DroidSansMono.ttf')
+assert(not font1)
+assert(err and type(err) == 'string')
+
+font1, err = open_font('fonts/DroidSansMono.ttf', 'not a number')
+assert(not font1)
+assert(err and type(err) == 'string')
+
 -- Test audio.
 
 local wave1, err = wave_from_file('waves/I_dont_exist.wav')
