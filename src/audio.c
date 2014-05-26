@@ -131,20 +131,22 @@ static int wave_from_file(lua_State * L) {
 	Wave * wave;
 	Wave ** ud;
 	SDL_RWops * file;
-	//char adjusted_filename[MAX_ADJUSTED_FILENAME_LEN];
 	
 	filename = luaL_checkstring(L, 1);
-	//prepend_data_path(adjusted_filename, filename, MAX_ADJUSTED_FILENAME_LEN);
 
 	// Load the audio samples.
 	file = SDL_RWFromFile(resource_path(filename), "rb");
 	if (!file) {
+		lua_settop(L, 0);
+		lua_pushnil(L);
 		lua_pushstring(L, SDL_GetError());
-		lua_error(L);
+		return 2;
 	}
 	if (SDL_LoadWAV_RW(file, 1, &wav_spec, &wav_buffer, &wav_length) == NULL) {
+		lua_settop(L, 0);
+		lua_pushnil(L);
 		lua_pushstring(L, SDL_GetError());
-		lua_error(L);
+		return 2;
 	}
 
 	// Convert audio samples to the application's audio specifications.
@@ -216,7 +218,10 @@ static int loop_wave(lua_State * L) {
 	
 	ud = (Wave **) lua_touserdata(L, 1);
 	if (ud == NULL) {
-		fatal("loop_wave called with bad argument");
+		lua_settop(L, 0);
+		lua_pushnil(L);
+		lua_pushstring(L, "loop_wave called with bad argument");
+		return 2;
 	}
 	wave = *ud;
 	if (wave == NULL) {

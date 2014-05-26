@@ -126,14 +126,11 @@ static void init() {
 		app_height = luaL_checkinteger(L, 1);
 	}
 	lua_settop(L, 0);
-puts("we're here");  
 	lua_getglobal(L, "app_title");
 	if (!lua_isnil(L, 1)) {
 		app_title = SDL_strdup(luaL_checkstring(L, 1));
 	}
 	lua_settop(L, 0);
-
-puts("ok to here");  
 
 	window = SDL_CreateWindow(
 		app_title, 
