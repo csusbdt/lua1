@@ -16,7 +16,6 @@ static int msgbox(lua_State * L) {
 }
 
 static int render_clear(lua_State * L) {
-	//SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	SDL_RenderClear(renderer);
 	return 0;
 }

@@ -60,8 +60,6 @@ render_texture(
 	20, 20
 )
 
-render_present()
-
 -- Test audio.
 
 local w, err = wave_from_file('waves/I_dont_exist.wav')
@@ -83,5 +81,8 @@ assert(not w2i and err)
 
 function on_touch(x, y)
 	print('x = ' .. x .. '  y = ' .. y)
+	render_present()
 end
+
+render_present()
 
