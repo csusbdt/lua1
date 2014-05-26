@@ -110,6 +110,11 @@ static int write_file(lua_State * L) {
 	return 0;
 }
 
+static int render_present(lua_State * L) {
+	SDL_RenderPresent(renderer);
+	return 0;
+}
+
 void register_util_functions(lua_State * L) {
 	lua_register(L, "quit"           , quit           );
 	lua_register(L, "msgbox"         , msgbox         );
@@ -118,4 +123,5 @@ void register_util_functions(lua_State * L) {
 	lua_register(L, "read_file"      , read_file      );
 	lua_register(L, "write_file"     , write_file     );
 	lua_register(L, "load_chunk"     , load_chunk     );
+	lua_register(L, "render_present" , render_present );
 }

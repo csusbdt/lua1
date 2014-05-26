@@ -4,6 +4,18 @@ extern char * resource_dir;
 extern char * save_dir;
 const SDL_Color APP_WHITE = { 255, 255, 255, 255 };
 
+/*
+void error(const char * fmt, ...) {
+	va_list v;
+	char buf[1024];
+
+	va_start(v, fmt);
+	vsnprintf(buf, 1024, fmt, v);
+	va_end(v);
+	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, app_title, buf, NULL);
+}
+*/
+
 void fatal(const char * fmt, ...) {
 	va_list v;
 	char buf[1024];
@@ -13,6 +25,78 @@ void fatal(const char * fmt, ...) {
 	va_end(v);
 	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, app_title, buf, NULL);
 	exit(1);
+}
+
+// Push error string onto stack.
+int app_error_1(lua_State * L, const char * fmt, ...) {
+	va_list v;
+	char buf[1024];
+
+	va_start(v, fmt);
+	vsnprintf(buf, 1024, fmt, v);
+	va_end(v);
+	lua_settop(L, 0);
+	lua_pushstring(L, buf);
+	return 1;
+}
+
+// Push nil and error string onto stack.
+int app_error_2(lua_State * L, const char * fmt, ...) {
+	va_list v;
+	char buf[1024];
+
+	va_start(v, fmt);
+	vsnprintf(buf, 1024, fmt, v);
+	va_end(v);
+	lua_settop(L, 0);
+	lua_pushnil(L);
+	lua_pushstring(L, buf);
+	return 2;
+}
+
+int sdl_error_1(lua_State * L) {
+	return app_error_1(L, "%s", SDL_GetError());
+//	lua_settop(L, 0);
+//	lua_pushstring(L, SDL_GetError());
+//	return 1;
+}
+
+int sdl_error_2(lua_State * L) {
+	return app_error_2(L, "%s", SDL_GetError());
+//	lua_settop(L, 0);
+//	lua_pushnil(L);
+//	lua_pushstring(L, SDL_GetError());
+//	return 2;
+}
+
+int ttf_error_1(lua_State * L) {
+	return app_error_1(L, "%s", TTF_GetError());
+//	lua_settop(L, 0);
+//	lua_pushstring(L, TTF_GetError());
+//	return 1;
+}
+
+int ttf_error_2(lua_State * L) {
+	return app_error_2(L, "%s", TTF_GetError());
+//	lua_settop(L, 0);
+//	lua_pushnil(L);
+//	lua_pushstring(L, TTF_GetError());
+//	return 2;
+}
+
+int img_error_1(lua_State * L) {
+	return app_error_1(L, "%s", IMG_GetError());
+//	lua_settop(L, 0);
+//	lua_pushstring(L, IMG_GetError());
+//	return 1;
+}
+
+int img_error_2(lua_State * L) {
+	return app_error_2(L, "%s", IMG_GetError());
+//	lua_settop(L, 0);
+//	lua_pushnil(L);
+//	lua_pushstring(L, IMG_GetError());
+//	return 2;
 }
 
 #define MAX_PATH 256

@@ -3,6 +3,7 @@
 extern SDL_Renderer * renderer;
 TTF_Font * get_font(lua_State * L, int stack_pos);
 
+// Push texture pointer as userdata, followed by width and height of texture.
 static int texture_from_surface(lua_State * L, SDL_Surface * surface) {
 	SDL_Texture * texture;
 	SDL_Texture ** ud;
@@ -11,13 +12,13 @@ static int texture_from_surface(lua_State * L, SDL_Surface * surface) {
 	
 	texture = SDL_CreateTextureFromSurface(renderer, surface);
 	SDL_FreeSurface(surface);
-	if (!texture) {
-		fatal(SDL_GetError());
-	}
+	if (!texture) return sdl_error_2(L);
+
 	ud = (SDL_Texture **) lua_newuserdata(L, sizeof(SDL_Texture *));
 	if (ud == NULL) {
-		fatal("failed to create userdata texture_from_surface");
+		return app_error_2(L, "Failed to create userdata in texture_from_surface.");
 	}
+
 	*ud = texture;
 	SDL_QueryTexture(texture, NULL, NULL, &w, &h);
 	lua_pushinteger(L, w);
@@ -29,14 +30,42 @@ static int texture_from_file(lua_State * L) {
 	const char * filename;
 	SDL_Surface * surface;
 	SDL_RWops * file;
-	
+		
+	// Check number of arguments.
+	if (lua_gettop(L) != 1) {
+		lua_settop(L, 0);
+		lua_pushnil(L);
+		lua_pushstring(L, "texture_from_file takes 1 argument: filename");
+		return 2;
+	}
+
+	// Check argument type.
+	if (lua_type(L, 1) != LUA_TSTRING) {
+		lua_settop(L, 0);
+		lua_pushnil(L);
+		lua_pushstring(L, "argument to texture_from_file should be a filename");
+		return 2;
+	}
 	filename = luaL_checkstring(L, 1);
+
+	// Open file.
 	file = SDL_RWFromFile(resource_path(filename), "rb");
 	if (!file) {
-		fatal(SDL_GetError());
+		lua_settop(L, 0);
+		lua_pushnil(L);
+		lua_pushstring(L, SDL_GetError());
+		return 2;
 	}
+
+	// Load image data.
 	surface = IMG_Load_RW(file, 1);
-	if (!surface) fatal(SDL_GetError()); 
+	if (!surface) {
+		lua_settop(L, 0);
+		lua_pushnil(L);
+		lua_pushstring(L, IMG_GetError());
+		return 2;
+	}
+
 	return texture_from_surface(L, surface);
 }
 
@@ -58,45 +87,96 @@ static int texture_from_font(lua_State * L) {
 static int destroy_texture(lua_State * L) {
 	SDL_Texture ** ud;
 	SDL_Texture * texture;
+		
+	// Check number of arguments.
+	if (lua_gettop(L) != 1) {
+		return app_error_1(L, "destroy_texture called with wrong number of arguments");
+	}
+
+	// Check argument type.
+	if (lua_type(L, 1) != LUA_TUSERDATA) {
+		return app_error_1(L, "Argument to destroy_texture not userdata.");
+	}
 	
 	ud = (SDL_Texture **) lua_touserdata(L, 1);
-	if (ud == NULL) {
-		fatal("destroy_texture called with bad argument");
+	if (!ud) {
+		return sdl_error_1(L);
 	}
+
 	texture = *ud;
-	if (texture == NULL) {
-		fatal("destroy_texture called with bad argument 2");
-	}
 	SDL_DestroyTexture(texture);
 	return 0;
 }
 
+/*
+	Possible ways to call this function from Lua:
+
+	render_texture(ud)
+	render_texture(ud, dst_x, dst_y) 
+	render_texture(ud, dst_x, dst_y, dst_w, dst_h) 
+	render_texture(ud, src_x, src_y, src_w, src_h, dst_x, dst_y) 
+	render_texture(ud, src_x, src_y, src_w, src_h, dst_x, dst_y, dst_w, dst_h) 
+	
+*/
 static int render_texture(lua_State * L) {
+	int numargs;
 	SDL_Texture ** ud;
 	SDL_Texture * texture;
 	SDL_Rect src;
 	SDL_Rect dst;
+
+	numargs = lua_gettop(L);
+
+	if (numargs != 1 && numargs != 3 && numargs != 5 && numargs != 7 && numargs != 9) {
+		return app_error_1(L, "render_texture called with wrong number of arguments");
+	}
+
+	if (lua_type(L, 1) != LUA_TUSERDATA) {
+		return app_error_1(L, "First argument to render_texture not userdata.");
+	}
 	
 	ud = (SDL_Texture **) lua_touserdata(L, 1);
-	if (ud == NULL) {
-		fatal("render_texture called with bad argument");
+	if (!ud) {
+		return sdl_error_1(L);
 	}
+
 	texture = *ud;
-	if (lua_gettop(L) == 5) {
+
+	if (numargs == 1) {
+	        SDL_RenderCopy(renderer, texture, NULL, NULL);
+	} else if (numargs == 3) {
 	        dst.x = luaL_checknumber(L, 2);
 	        dst.y = luaL_checknumber(L, 3);
 		SDL_QueryTexture(texture, NULL, NULL, &dst.w, &dst.h);
 	        SDL_RenderCopy(renderer, texture, NULL, &dst);
-	} else {
-        src.x = luaL_checknumber(L, 2);
-        src.y = luaL_checknumber(L, 3);
+	} else if (numargs == 5) {
+	        dst.x = luaL_checknumber(L, 2);
+	        dst.y = luaL_checknumber(L, 3);
+		dst.w = luaL_checknumber(L, 4);
+		dst.h = luaL_checknumber(L, 5);
+	        SDL_RenderCopy(renderer, texture, NULL, &dst);
+	} else if (numargs == 7) {
+		src.x = luaL_checknumber(L, 2);
+		src.y = luaL_checknumber(L, 3);
 		src.w = luaL_checknumber(L, 4);
 		src.h = luaL_checknumber(L, 5);
-        dst.x = luaL_checknumber(L, 6);
-        dst.y = luaL_checknumber(L, 7);
+		dst.x = luaL_checknumber(L, 6);
+		dst.y = luaL_checknumber(L, 7);
+		dst.w = src.w;
+		dst.h = src.h;
+		SDL_RenderCopy(renderer, texture, &src, &dst);
+	} else if (numargs == 9) {
+		src.x = luaL_checknumber(L, 2);
+		src.y = luaL_checknumber(L, 3);
+		src.w = luaL_checknumber(L, 4);
+		src.h = luaL_checknumber(L, 5);
+		dst.x = luaL_checknumber(L, 6);
+		dst.y = luaL_checknumber(L, 7);
 		dst.w = luaL_checknumber(L, 8);
 		dst.h = luaL_checknumber(L, 9);
-        SDL_RenderCopy(renderer, texture, &src, &dst);
+		SDL_RenderCopy(renderer, texture, &src, &dst);
+	} else {
+		SDL_assert(false);
 	}
 	return 0;
 }

@@ -8,6 +8,7 @@ clean :
 
 osx :
 	if [ ! -d build ]; then mkdir -p build; fi
+	if [ -e build/a.out ]; then rm build/a.out; fi
 	clang 	-o build/a.out                 \
 		`sdl2-config --libs --cflags`  \
 		-I /usr/local/include          \

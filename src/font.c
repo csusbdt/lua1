@@ -1,16 +1,15 @@
 #include "global.h"
 
+// On failure, returns NULL. Call SDL_GetError() for error string.
 TTF_Font * get_font(lua_State * L, int stack_pos) {
 	TTF_Font ** ud;
 
 	ud = (TTF_Font **) lua_touserdata(L, 1);
-	if (ud == NULL) {
-		//lua_settop(L, 0);
-		//lua_pushnil(L);
-		//lua_pushstring(L, SDL_GetError());
+	if (ud) {
+		return *ud;
+	} else {
 		return NULL;
 	}
-	return *ud;
 }
 
 static int open_font(lua_State * L) {
@@ -20,6 +19,7 @@ static int open_font(lua_State * L) {
 	TTF_Font ** ud;
 	SDL_RWops * file;
 	
+	// Check argument 1.
 	if (lua_gettop(L) != 2) {
 		lua_settop(L, 0);
 		lua_pushnil(L);
@@ -40,6 +40,8 @@ static int open_font(lua_State * L) {
 		lua_pushstring(L, SDL_GetError());
 		return 2;
 	}
+
+	// Check argument 2.
 	if (lua_type(L, 2) != LUA_TNUMBER) {
 		lua_settop(L, 0);
 		lua_pushnil(L);
@@ -47,6 +49,8 @@ static int open_font(lua_State * L) {
 		return 2;
 	}
 	fontsize = luaL_checkinteger(L, 2);
+
+	// Open font.
 	font = TTF_OpenFontRW(file, 1, fontsize);
 	if (!font) {
 		lua_settop(L, 0);
@@ -54,8 +58,15 @@ static int open_font(lua_State * L) {
 		lua_pushstring(L, TTF_GetError());
 		return 2;
 	}
+
+	// Return font pointer as userdata.
 	ud = (TTF_Font **) lua_newuserdata(L, sizeof(TTF_Font *));
-	if (ud == NULL) fatal("ud NULL in open_font");
+	if (!ud) {
+		lua_settop(L, 0);
+		lua_pushnil(L);
+		lua_pushstring(L, SDL_GetError());
+		return 2;
+	}
 	*ud = font;
 	return 1;
 }
@@ -63,7 +74,20 @@ static int open_font(lua_State * L) {
 static int close_font(lua_State * L) {
 	TTF_Font * font;
 
+	if (lua_gettop(L) != 1) {
+		return app_error_1(L, "close_font takes 1 argument");
+		//return 0;
+	}
+	if (!lua_isuserdata(L, 1)) { // lua_islightuserdata does not work here.
+		return app_error_1(L, "close_font argument not a font");
+		//return 0;
+	}
 	font = get_font(L, 1);
+	if (!font) {
+		//error("%s %s", SDL_GetError());
+		//return 0;
+		return sdl_error_1(L);
+	}
 	TTF_CloseFont(font);
 	return 0;
 }
