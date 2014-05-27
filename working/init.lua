@@ -48,17 +48,7 @@ assert(err == nil)
 err = destroy_texture('Not a texture')
 assert(type(err) == 'string')
 
-err = render_texture(t)
-assert(err == nil)
-render_texture(t, 100, 100)
-render_texture(t, 200, 200, 32, 32)
-render_texture(t, 50, 50, 100, 100, 300, 300)
-render_texture(t, 50, 50, 100, 100, 400, 300, 32, 32)
-
-render_texture(
-	texture_from_font(f, "Testing 1 2 3 ..."),
-	20, 20
-)
+local testing123 = texture_from_font(f, "Testing 1 2 3 ...")
 
 -- Test audio.
 
@@ -80,9 +70,16 @@ assert(not w2i and err)
 -- Test on touch event.
 
 function on_touch(x, y)
+	msgbox('hi')
 	print('x = ' .. x .. '  y = ' .. y)
-	render_present()
 end
 
-render_present()
+function on_update()
+	render_texture(t)
+	render_texture(t, 100, 100)
+	render_texture(t, 200, 200, 32, 32)
+	render_texture(t, 50, 50, 100, 100, 300, 300)
+	render_texture(t, 50, 50, 100, 100, 400, 300, 32, 32)
+	render_texture(testing123, 20, 20)
+end
 

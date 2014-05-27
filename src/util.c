@@ -12,13 +12,14 @@ static int msgbox(lua_State * L) {
 	
 	msg = luaL_checkstring(L, 1);
 	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, app_title, msg, NULL); 
+	SDL_RaiseWindow(window);
 	return 0;
 }
 
-static int render_clear(lua_State * L) {
-	SDL_RenderClear(renderer);
-	return 0;
-}
+//static int render_clear(lua_State * L) {
+//	SDL_RenderClear(renderer);
+//	return 0;
+//}
 
 static int set_draw_color(lua_State * L) {
 	int r, g, b, a;
@@ -115,10 +116,10 @@ static int write_file(lua_State * L) {
 	return 0;
 }
 
-static int render_present(lua_State * L) {
-	SDL_RenderPresent(renderer);
-	return 0;
-}
+//static int render_present(lua_State * L) {
+//	SDL_RenderPresent(renderer);
+//	return 0;
+//}
 
 void register_util_functions(lua_State * L) {
 	lua_register(L, "quit"           , quit           );
@@ -126,8 +127,8 @@ void register_util_functions(lua_State * L) {
 	lua_register(L, "set_draw_color" , set_draw_color );
 	lua_register(L, "draw_line"      , draw_line      );
 	lua_register(L, "read_file"      , read_file      );
-	lua_register(L, "render_present" , render_present );
-	lua_register(L, "render_clear"   , render_clear   );
+//	lua_register(L, "render_present" , render_present );
+//	lua_register(L, "render_clear"   , render_clear   );
 	lua_register(L, "write_file"     , write_file     );
 	lua_register(L, "load_chunk"     , load_chunk     );
 }

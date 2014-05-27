@@ -17,6 +17,7 @@ typedef int bool;
 #define false 0
 #define true 1
 
+extern SDL_Window   * window;
 extern SDL_Renderer * renderer;
 extern int app_width;
 extern int app_height;

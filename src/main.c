@@ -7,6 +7,7 @@
 bool process_event_queue(lua_State * L);
 
 bool		  running 	= true;
+SDL_Window	* window	= NULL;
 SDL_Renderer 	* renderer	= NULL;
 char		* resource_dir 	= NULL;
 char 		* save_dir 	= NULL;
@@ -16,7 +17,6 @@ char 		* app_title 	= "No Title Set";
 
 static int 	  	  app_millis_per_update = 1000 / 60;
 static lua_State	* L;
-static SDL_Window	* window;
 
 void register_util_functions	(lua_State * L);
 void register_texture_functions	(lua_State * L);
@@ -190,11 +190,14 @@ static void init() {
 */
 static void update() {
 	SDL_assert(lua_gettop(L) == 0);
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+	SDL_RenderClear(renderer);
 	lua_getglobal(L, "on_update");
 	if (!lua_isnil(L, 1)) {
 		if (lua_pcall(L, 0, 0, 0)) fatal(lua_tostring(L, -1));
 	}
 	lua_settop(L, 0);
+	SDL_RenderPresent(renderer);
 }
 
 /*

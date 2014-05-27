@@ -35,6 +35,8 @@ static int open_font(lua_State * L) {
 	filename = luaL_checkstring(L, 1);
 	file = SDL_RWFromFile(resource_path(filename), "rt");
 	if (!file) {
+//lua_pushstring(L, SDL_GetError());
+//lua_error(L);
 		lua_settop(L, 0);
 		lua_pushnil(L);
 		lua_pushstring(L, SDL_GetError());

@@ -25,11 +25,13 @@ osx-static :
 	if [ -e build/a.out ]; then rm build/a.out; fi
 	clang 	-o build/a.out                                \
 		`sdl2-config --libs --cflags  --static-libs`  \
+		-L /opt/X11/lib                               \
 		-I /usr/local/include                         \
 		-Bstatic                                      \
 		-llua                                         \
 		-lSDL2_ttf                                    \
 		-lSDL2_image                                  \
+		-lfreetype.6                                  \
 		-D SDL_ASSERT_LEVEL=2                         \
 		src/*.c
 
