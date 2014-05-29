@@ -14,6 +14,10 @@ static int texture_from_surface(lua_State * L, SDL_Surface * surface) {
 	SDL_FreeSurface(surface);
 	if (!texture) return sdl_error_2(L);
 
+	//if (SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND)) {
+	//	return sdl_error_2(L);
+	//}
+
 	ud = (SDL_Texture **) lua_newuserdata(L, sizeof(SDL_Texture *));
 	if (ud == NULL) {
 		return app_error_2(L, "Failed to create userdata in texture_from_surface.");
@@ -73,6 +77,7 @@ static int texture_from_font(lua_State * L) {
 	TTF_Font * font;
 	SDL_Surface * surface;
 	const char * text;
+	SDL_Color color;
 	
 	font = get_font(L, 1);
 	text = luaL_checkstring(L, 2);
@@ -80,7 +85,16 @@ static int texture_from_font(lua_State * L) {
 		lua_pushnil(L);
 		return 1;
 	}
-	surface = TTF_RenderText_Blended(font, text, APP_WHITE);
+	color = APP_WHITE;
+	if (lua_gettop(L) >= 5) {
+		color.r = luaL_checkint(L, 3);
+		color.g = luaL_checkint(L, 4);
+		color.r = luaL_checkint(L, 5);
+	}
+	if (lua_gettop(L) == 6) {
+		color.a = luaL_checkint(L, 6);
+	}
+	surface = TTF_RenderText_Blended(font, text, color);
 	return texture_from_surface(L, surface);
 }
 
