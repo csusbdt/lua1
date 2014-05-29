@@ -49,7 +49,7 @@ err = destroy_texture('Not a texture')
 assert(type(err) == 'string')
 
 local testing123 = texture_from_font(f, "Testing 1 2 3 ...")
-local testing456 = texture_from_font(f, "Testing 4 5 6 ...", 0, 145, 100, 120)
+local testing456 = texture_from_font(f, "Testing 4 5 6 ...", 0, 0, 0, 255)
 
 -- Test audio.
 

@@ -89,7 +89,7 @@ static int texture_from_font(lua_State * L) {
 	if (lua_gettop(L) >= 5) {
 		color.r = luaL_checkint(L, 3);
 		color.g = luaL_checkint(L, 4);
-		color.r = luaL_checkint(L, 5);
+		color.b = luaL_checkint(L, 5);
 	}
 	if (lua_gettop(L) == 6) {
 		color.a = luaL_checkint(L, 6);
