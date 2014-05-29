@@ -19,7 +19,6 @@ osx :
 		-l SDL2                      \
 		-l z                         \
 		-l bz2                       \
-		-l m                         \
 		-l iconv                     \
 		-l objc                      \
 		-l lua                       \
