@@ -15,6 +15,7 @@ osx :
 		-D _THREAD_SAFE              \
 		-D SDL_ASSERT_LEVEL=2        \
 		-I include                   \
+		-I lua                       \
 		-L osx/lib                   \
 		-l SDL2                      \
 		-l z                         \
