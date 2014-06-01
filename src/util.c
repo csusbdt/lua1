@@ -16,11 +16,6 @@ static int msgbox(lua_State * L) {
 	return 0;
 }
 
-//static int render_clear(lua_State * L) {
-//	SDL_RenderClear(renderer);
-//	return 0;
-//}
-
 static int set_draw_color(lua_State * L) {
 	int r, g, b, a;
 
@@ -40,6 +35,37 @@ static int draw_line(lua_State * L) {
 	x2 = luaL_checkinteger(L, 3);
 	y2 = luaL_checkinteger(L, 4);
 	if (SDL_RenderDrawLine(renderer, x1, y1, x2, y2)) fatal(SDL_GetError());
+	return 0;
+}
+
+static int fill_rect(lua_State * L) {
+	SDL_Rect rect;
+
+	rect.x = luaL_checkinteger(L, 1);
+	rect.y = luaL_checkinteger(L, 2);
+	rect.w  = luaL_checkinteger(L, 3);
+	rect.h  = luaL_checkinteger(L, 4);
+	if (SDL_RenderFillRect(renderer, &rect)) fatal(SDL_GetError());
+	return 0;
+}
+
+static int blendmode_none(lua_State * L) {
+	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+	return 0;
+}
+
+static int blendmode_blend(lua_State * L) {
+	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+	return 0;
+}
+
+static int blendmode_add(lua_State * L) {
+	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_ADD);
+	return 0;
+}
+
+static int blendmode_mod(lua_State * L) {
+	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_MOD);
 	return 0;
 }
 
@@ -116,19 +142,17 @@ static int write_file(lua_State * L) {
 	return 0;
 }
 
-//static int render_present(lua_State * L) {
-//	SDL_RenderPresent(renderer);
-//	return 0;
-//}
-
 void register_util_functions(lua_State * L) {
-	lua_register(L, "quit"           , quit           );
-	lua_register(L, "msgbox"         , msgbox         );
-	lua_register(L, "set_draw_color" , set_draw_color );
-	lua_register(L, "draw_line"      , draw_line      );
-	lua_register(L, "read_file"      , read_file      );
-//	lua_register(L, "render_present" , render_present );
-//	lua_register(L, "render_clear"   , render_clear   );
-	lua_register(L, "write_file"     , write_file     );
-	lua_register(L, "load_chunk"     , load_chunk     );
+	lua_register(L, "quit"            , quit            );
+	lua_register(L, "msgbox"          , msgbox          );
+	lua_register(L, "set_draw_color"  , set_draw_color  );
+	lua_register(L, "blendmode_none"  , blendmode_none  );
+	lua_register(L, "blendmode_blend" , blendmode_blend );
+	lua_register(L, "blendmode_add"   , blendmode_add   );
+	lua_register(L, "blendmode_mod"   , blendmode_mod   );
+	lua_register(L, "draw_line"       , draw_line       );
+	lua_register(L, "fill_rect"       , fill_rect       );
+	lua_register(L, "read_file"       , read_file       );
+	lua_register(L, "write_file"      , write_file      );
+	lua_register(L, "load_chunk"      , load_chunk      );
 }

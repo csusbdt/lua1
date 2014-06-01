@@ -83,5 +83,11 @@ function on_update()
 	render_texture(t, 50, 50, 100, 100, 400, 300, 32, 32)
 	render_texture(testing123, 20, 20)
 	render_texture(testing456, 20, 40)
+	blendmode_blend();
+	set_draw_color(255, 0, 0, 75)
+	fill_rect(400, 220, 50, 75)
+	blendmode_none();
+	set_draw_color(255, 0, 0, 75)
+	fill_rect(350, 220, 50, 75)
 end
 
