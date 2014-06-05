@@ -6,7 +6,7 @@ static int fullscreen(lua_State * L) {
 	if (is_ios() || is_android()) return 0;
 	if (app_fullscreen) return 0;
 	app_fullscreen = true;
-	if (SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN)) {
+	if (SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP)) {
 		fatal(SDL_GetError());
 	}
 	return 0;

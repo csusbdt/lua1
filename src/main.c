@@ -167,8 +167,8 @@ static void init() {
 	} else if (is_android()) {
 		                    window_flags = SDL_WINDOW_OPENGL;
 	} else if (is_osx()) {
-		if (app_fullscreen) window_flags = SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP;
-		else                window_flags = SDL_WINDOW_OPENGL;
+		if (app_fullscreen) window_flags = SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_RESIZABLE;
+		else                window_flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
 	} else if (is_windows()) {
 		if (app_fullscreen) window_flags = SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP;
 		else                window_flags = SDL_WINDOW_OPENGL;

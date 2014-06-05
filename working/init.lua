@@ -48,8 +48,8 @@ assert(err == nil)
 err = destroy_texture('Not a texture')
 assert(type(err) == 'string')
 
-local testing123 = texture_from_font(f, "Testing 1 2 3 ...")
-local testing456 = texture_from_font(f, "Testing 4 5 6 ...", 0, 0, 0, 255)
+local testing123 = texture_from_font(f, "Press F for fullscreen")
+local testing456 = texture_from_font(f, "Press ESC for windowed", 0, 0, 0, 255)
 
 -- Test audio.
 
@@ -71,12 +71,13 @@ assert(not w2i and err)
 -- Test on touch event.
 
 function on_touch(x, y)
-	msgbox('hi')
 	print('x = ' .. x .. '  y = ' .. y)
+	msgbox('hi')
 end
 
 function on_keydown(key)
-	if (key == 27) then windowed() end
+	if     (key ==  27) then windowed() 
+	elseif (key == 102) then fullscreen() end
 end
 
 function on_update()
@@ -87,10 +88,10 @@ function on_update()
 	render_texture(t, 50, 50, 100, 100, 400, 300, 32, 32)
 	render_texture(testing123, 20, 20)
 	render_texture(testing456, 20, 40)
-	blendmode_blend();
+	blendmode_blend()
 	set_draw_color(255, 0, 0, 75)
 	fill_rect(400, 220, 50, 75)
-	blendmode_none();
+	blendmode_none()
 	set_draw_color(255, 0, 0, 75)
 	fill_rect(350, 220, 50, 75)
 end
