@@ -21,51 +21,31 @@ static int open_font(lua_State * L) {
 	
 	// Check argument 1.
 	if (lua_gettop(L) != 2) {
-		lua_settop(L, 0);
-		lua_pushnil(L);
-		lua_pushstring(L, "open_font takes 2 arguments: filename and size");
-		return 2;
+		return app_error_2(L, "open_font takes 2 arguments: filename and size");
 	}
 	if (lua_type(L, 1) != LUA_TSTRING) {
-		lua_settop(L, 0);
-		lua_pushnil(L);
-		lua_pushstring(L, "first argument to open_font should be a filename");
-		return 2;
+		return app_error_2(L, "first argument to open_font should be a filename");
 	}
 	filename = luaL_checkstring(L, 1);
 	file = SDL_RWFromFile(resource_path(filename), "rt");
-	if (!file) {
-		lua_settop(L, 0);
-		lua_pushnil(L);
-		lua_pushstring(L, SDL_GetError());
-		return 2;
-	}
+	if (!file) return sdl_error_2(L);
 
 	// Check argument 2.
 	if (lua_type(L, 2) != LUA_TNUMBER) {
-		lua_settop(L, 0);
-		lua_pushnil(L);
-		lua_pushstring(L, "second argument to open_font should be a font size");
-		return 2;
+		return app_error_2(L, "second argument to open_font should be a font size");
 	}
 	fontsize = luaL_checkinteger(L, 2);
 
 	// Open font.
 	font = TTF_OpenFontRW(file, 1, fontsize);
 	if (!font) {
-		lua_settop(L, 0);
-		lua_pushnil(L);
-		lua_pushstring(L, TTF_GetError());
-		return 2;
+		return ttf_error_2(L);
 	}
 
 	// Return font pointer as userdata.
 	ud = (TTF_Font **) lua_newuserdata(L, sizeof(TTF_Font *));
 	if (!ud) {
-		lua_settop(L, 0);
-		lua_pushnil(L);
-		lua_pushstring(L, SDL_GetError());
-		return 2;
+		return sdl_error_2(L);
 	}
 	*ud = font;
 	return 1;
