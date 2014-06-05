@@ -75,6 +75,10 @@ function on_touch(x, y)
 	print('x = ' .. x .. '  y = ' .. y)
 end
 
+function on_keydown(key)
+	if (key == 27) then windowed() end
+end
+
 function on_update()
 	render_texture(t)
 	render_texture(t, 100, 100)

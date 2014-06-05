@@ -2,6 +2,27 @@
 
 extern bool running;
 
+static int fullscreen(lua_State * L) {
+	if (is_ios() || is_android()) return 0;
+	if (app_fullscreen) return 0;
+	app_fullscreen = true;
+	if (SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN)) {
+		fatal(SDL_GetError());
+	}
+	return 0;
+}
+
+int windowed(lua_State * L) {
+	if (is_ios() || is_android()) return 0;
+	if (!app_fullscreen) return 0;
+	app_fullscreen = false;
+	if (SDL_SetWindowFullscreen(window, 0)) {
+		fatal(SDL_GetError());
+	}
+	SDL_SetWindowSize(window, app_width, app_height);
+	return 0;
+}
+
 static int quit(lua_State * L) {
 	running = false;
 	return 0;
@@ -143,6 +164,8 @@ static int write_file(lua_State * L) {
 }
 
 void register_util_functions(lua_State * L) {
+	lua_register(L, "fullscreen"      , fullscreen      );
+	lua_register(L, "windowed"        , windowed        );
 	lua_register(L, "quit"            , quit            );
 	lua_register(L, "msgbox"          , msgbox          );
 	lua_register(L, "set_draw_color"  , set_draw_color  );
@@ -156,3 +179,4 @@ void register_util_functions(lua_State * L) {
 	lua_register(L, "write_file"      , write_file      );
 	lua_register(L, "load_chunk"      , load_chunk      );
 }
+

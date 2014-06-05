@@ -1,19 +1,16 @@
 #include "global.h"
 
-#define SDL_INIT_FLAGS (SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_EVENTS)
-//#define DESIRED_MILLIS_PER_FRAME (1000 / 60)
-#define RENDERER_INIT_FLAGS (SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC)
-
 bool process_event_queue(lua_State * L);
 
-bool		  running 	= true;
-SDL_Window	* window	= NULL;
-SDL_Renderer 	* renderer	= NULL;
-char		* resource_dir 	= NULL;
-char 		* save_dir 	= NULL;
-int		  app_width 	= 16 * 50;
-int		  app_height 	= 9 * 50;
-char 		* app_title 	= "No Title Set";
+bool		  running 	 = true;
+SDL_Window	* window	 = NULL;
+SDL_Renderer 	* renderer	 = NULL;
+char		* resource_dir 	 = NULL;
+char 		* save_dir 	 = NULL;
+int		  app_width 	 = 16 * 50;
+int		  app_height 	 = 9 * 50;
+bool		  app_fullscreen = false;
+char 		* app_title 	 = "No Title Set";
 
 static int 	  	  app_millis_per_update = 1000 / 60;
 static lua_State	* L;
@@ -92,6 +89,17 @@ static void config() {
 	}
 	lua_settop(L, 0);
 
+	// app_fullscreen
+	if (!is_ios() && !is_android()) {
+		lua_getglobal(L, "app_fullscreen");
+		if (!lua_isnil(L, 1)) {
+			app_fullscreen = lua_toboolean(L, 1);
+		} else {
+			app_fullscreen = false;
+		}
+		lua_settop(L, 0);
+	}
+
 	// save_dir
 	lua_getglobal(L, "app_save_folder");
 	if (!lua_isnil(L, 1)) {
@@ -120,20 +128,17 @@ static void config() {
 	Initialize SDL, SDL_ttf, SDL_image and Lua.
 	Register the app's C functions with Lua.
 	Call the app's config and init scripts.
-
-	The main purpose of the init script is to define the following
-	global functions:
-		on_update
-		on_touch
-		on_quit
 */
 static void init() {
 	char * base_path;
 	int img_support;
+	int window_flags;
     
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
 
-	if (SDL_Init(SDL_INIT_FLAGS)) fatal(SDL_GetError());
+	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
+		fatal(SDL_GetError());
+	}
 
 	// Determine the resource dir.
 	base_path = SDL_GetBasePath();
@@ -157,16 +162,31 @@ static void init() {
 		fatal("Required image support missing.");
 	}
 
+	if (is_ios()) {
+		                    window_flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
+	} else if (is_android()) {
+		                    window_flags = SDL_WINDOW_OPENGL;
+	} else if (is_osx()) {
+		if (app_fullscreen) window_flags = SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP;
+		else                window_flags = SDL_WINDOW_OPENGL;
+	} else if (is_windows()) {
+		if (app_fullscreen) window_flags = SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP;
+		else                window_flags = SDL_WINDOW_OPENGL;
+	} else if (is_linux()) {
+		if (app_fullscreen) window_flags = SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP;
+		else                window_flags = SDL_WINDOW_OPENGL;
+	}
+
 	window = SDL_CreateWindow(
 		app_title, 
 		SDL_WINDOWPOS_CENTERED,
 		SDL_WINDOWPOS_CENTERED,
 		app_width,
 		app_height,
-		SDL_WINDOW_OPENGL);
+		window_flags);
 	if (!window) fatal(SDL_GetError());
 
-	renderer = SDL_CreateRenderer(window, -1, RENDERER_INIT_FLAGS);
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	if (!renderer) fatal(SDL_GetError());
 
 	if (SDL_RenderSetLogicalSize(renderer, app_width, app_height)) {
