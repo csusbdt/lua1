@@ -17,7 +17,7 @@ physical devices -- the process is similar for emulated devices.
 These instructions assume you have an iOS device and an iOS developer account.
 
 The Lua source code is located under lua1/lua. These include all the Lua files except
-for lua.c, luac.c, lua.hpp.  This 
+for lua.c, luac.c, lua.hpp.  
 
 The SDL header files, including SDL2_ttf.h and SDL2_image.h, are stored in lua1/include.
 
