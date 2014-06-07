@@ -132,21 +132,24 @@ static int wave_from_file(lua_State * L) {
 	Wave ** ud;
 	SDL_RWops * file;
 	
+	// Check arguments.
+	if (lua_gettop(L) != 1) {
+		luaL_error(L, "wave_from_file takes a single argument: filename");
+	}
+	if (lua_type(L, 1) != LUA_TSTRING) {
+		luaL_error(L, "argument to wave_from_file not a string");
+	}
+
+	// Extract argument.
 	filename = luaL_checkstring(L, 1);
 
 	// Load the audio samples.
 	file = SDL_RWFromFile(resource_path(filename), "rb");
 	if (!file) {
-		lua_settop(L, 0);
-		lua_pushnil(L);
-		lua_pushstring(L, SDL_GetError());
-		return 2;
+		luaL_error(L, SDL_GetError());
 	}
 	if (SDL_LoadWAV_RW(file, 1, &wav_spec, &wav_buffer, &wav_length) == NULL) {
-		lua_settop(L, 0);
-		lua_pushnil(L);
-		lua_pushstring(L, SDL_GetError());
-		return 2;
+		luaL_error(L, SDL_GetError());
 	}
 
 	// Convert audio samples to the application's audio specifications.
@@ -168,6 +171,9 @@ static int wave_from_file(lua_State * L) {
 	}
 
 	wave = (Wave *) SDL_malloc(sizeof(Wave));
+	if (wave == NULL) {
+		luaL_error(L, "malloc return NULL in wave_from_file");
+	}
 	wave->len = len;
 	wave->buf = buf;
 	wave->refs = 1;
@@ -181,15 +187,27 @@ static int destroy_wave(lua_State * L) {
 	Wave ** ud;
 	Wave * wave;
 	
+	// Check arguments.
+	if (lua_gettop(L) != 1) {
+		luaL_error(L, "wrong number of arguments passed to destroy_wave");
+	}
+	if (lua_type(L, 1) != LUA_TUSERDATA) {
+		luaL_error(L, "argument to destroy_wave should be userdata");
+	}
+	
+	// Extract arguments.
 	ud = (Wave **) lua_touserdata(L, 1);
 	if (ud == NULL) {
-		fatal("destroy_wave called with bad argument");
+		luaL_error(L, "userdata unexpectedly null in destroy_wave");
 	}
 	wave = *ud;
 	if (wave == NULL) {
-		fatal("destroy_wave called with bad argument 2");
+		luaL_error(L, "destroy_wave called with null wave");
 	}
+
+	// Do it.
 	release_wave(wave);
+	*ud = NULL; // To help with debugging.
 	return 0;
 }
 
@@ -197,14 +215,25 @@ static int play_wave(lua_State * L) {
 	Wave ** ud;
 	Wave * wave;
 	
+	// Check arguments.
+	if (lua_gettop(L) != 1) {
+		luaL_error(L, "wrong number of arguments passed to play_wave");
+	}
+	if (lua_type(L, 1) != LUA_TUSERDATA) {
+		luaL_error(L, "argument to play_wave should be userdata");
+	}
+	
+	// Extract arguments.
 	ud = (Wave **) lua_touserdata(L, 1);
 	if (ud == NULL) {
-		fatal("play_wave called with bad argument");
+		luaL_error(L, "userdata unexpectedly null in play_wave");
 	}
 	wave = *ud;
 	if (wave == NULL) {
-		fatal("play_wave called with bad argument 2");
+		luaL_error(L, "play_wave called with null wave");
 	}
+
+	// Do it.
 	lock_audio();
 	fill_empty_play_instance(wave);
 	unlock_audio();
@@ -216,17 +245,25 @@ static int loop_wave(lua_State * L) {
 	Wave * wave;
 	int i;
 	
+	// Check arguments.
+	if (lua_gettop(L) != 1) {
+		luaL_error(L, "wrong number of arguments passed to loop_wave");
+	}
+	if (lua_type(L, 1) != LUA_TUSERDATA) {
+		luaL_error(L, "argument to loop_wave should be userdata");
+	}
+	
+	// Extract arguments.
 	ud = (Wave **) lua_touserdata(L, 1);
 	if (ud == NULL) {
-		lua_settop(L, 0);
-		lua_pushnil(L);
-		lua_pushstring(L, "loop_wave called with bad argument");
-		return 2;
+		luaL_error(L, "userdata unexpectedly null in loop_wave");
 	}
 	wave = *ud;
 	if (wave == NULL) {
-		fatal("loop_wave called with bad argument 2");
+		luaL_error(L, "loop_wave called with null wave");
 	}
+
+	// Do it.
 	lock_audio();
 	i = fill_empty_loop_instance(wave);
 	unlock_audio();
@@ -238,7 +275,18 @@ static int loop_wave(lua_State * L) {
 static int stop_loop(lua_State * L) {
 	int i;
 	
+	// Check arguments.
+	if (lua_gettop(L) != 1) {
+		luaL_error(L, "wrong number of arguments passed to stop_loop");
+	}
+	if (lua_type(L, 1) != LUA_TNUMBER) {
+		luaL_error(L, "argument to stop_loop should be an integer");
+	}
+	
+	// Extract arguments.
 	i = luaL_checknumber(L, 1);
+
+	// Do it.
 	lock_audio();
 	reset_loop_instance(i);
 	unlock_audio();
@@ -300,3 +348,4 @@ void register_audio_functions(lua_State * L) {
 	lua_register(L, "loop_wave"      , loop_wave      );
 	lua_register(L, "stop_loop"      , stop_loop      );
 }
+
