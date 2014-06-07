@@ -1,4 +1,4 @@
-local f = open_font('fonts/DroidSansMono.ttf', 36)
+local f = open_font('fonts/DroidSansMono.ttf', 26)
 
 local s = "Clické for next test."
 
@@ -7,17 +7,24 @@ local w, h = font_texture_size(f, s)
 local t1 = texture_from_font(f, s)
 local t2 = texture_from_font(f, s, 100, 255, 25)
 local t3 = texture_from_font(f, s, 100, 255, 25, 40)
+local w, h = font_texture_size(f, s)
 
-local cara, w, h = texture_from_file('textures/Cara.png')
+local cara, cw, ch = texture_from_file('textures/Cara.png')
+local jpg, cw, ch = texture_from_file('textures/Cara.jpg')
 
-texture_blendmode_blend(t2)
-texture_blendmode_blend(t3)
+texture_alpha_mod(cara, 100)
+texture_alpha_mod(t1, 100)
+texture_alpha_mod(t2, 100)
+texture_alpha_mod(t3, 100)
 
 function on_update()
-	render_texture(cara, 50, 50) 
-	render_texture(t1, 50, 50) 
-	render_texture(t2, 50, 80) 
-	render_texture(t3, 50, 110) 
+	local y = 50
+	blendmode_blend()
+	render_texture(jpg, 50, 50) 
+	render_texture(cara, 70, 50) 
+	render_texture(t1, 50, y); y = y + h
+	render_texture(t2, 50, y); y = y + h
+	render_texture(t3, 50, y) 
 end
 
 function on_touch()
