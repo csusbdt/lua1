@@ -41,7 +41,7 @@ Open the xcode project and do the following:
 	e) Delete main.c.
 	f) Under Sources, add the files in lua1/src/.
 	g) Under Frameworks, add MobileCoreServices.framework and ImageIO.framework. 
-	h) Under Resources, add the resource folders/files (with _create folder references_ checked).
+	h) Under Resources, add the resource foldersand files (with "create folder references" checked).
 
 Close Xcode for the time being.
 

@@ -1,3 +1,7 @@
+dofile('tests/fonts.lua')
+
+
+--[[
 -- Test fonts.
 
 local f, f2, t, t2, w, w2, wi, w2i
@@ -95,4 +99,5 @@ function on_update()
 	set_draw_color(255, 0, 0, 75)
 	fill_rect(350, 220, 50, 75)
 end
+--]]
 
