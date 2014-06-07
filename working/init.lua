@@ -1,31 +1,9 @@
 dofile('tests/fonts.lua')
 dofile('tests/textures.lua')
+dofile('tests/screen1.lua')
 
 
 --[[
-
--- Test textures.
-
-t, err = texture_from_file(1, 2)
-assert(not t and type(err) == 'string')
-
-t, err = texture_from_file(1)
-assert(not t and type(err) == 'string')
-
-t, err = texture_from_file('textures/I_dont_exist.png')
-assert(not t and type(err) == 'string')
-
-t, w, h = texture_from_file('textures/Cara.png')
-assert(type(t) == 'userdata' and type(w) == 'number' and type(h) == 'number')
-
-t2 = texture_from_file('textures/Cara.png')
-assert(type(t2) == 'userdata' and t~= t2)
-
-err = destroy_texture(t2)
-assert(err == nil)
-
-err = destroy_texture('Not a texture')
-assert(type(err) == 'string')
 
 local testing123 = texture_from_font(f, "Press F for fullscreen")
 local testing456 = texture_from_font(f, "Press ESC for windowed", 0, 0, 0, 255)

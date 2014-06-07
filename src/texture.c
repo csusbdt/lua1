@@ -117,14 +117,13 @@ static int texture_from_font(lua_State * L) {
 	if (lua_gettop(L) == 6) {
 		color.a = luaL_checkint(L, 6);
 	}
-	surface = TTF_RenderText_Blended(font, text, color);
+	surface = TTF_RenderUTF8_Blended(font, text, color);
 	return texture_from_surface(L, surface);
 }
 
 static int destroy_texture(lua_State * L) {
 	SDL_Texture ** ud;
 	SDL_Texture * texture;
-		
 
 	// Check arguments.
 	if (lua_gettop(L) != 1) {
@@ -220,9 +219,38 @@ static int render_texture(lua_State * L) {
 	return 0;
 }
 
+static int texture_blendmode_blend(lua_State * L) {
+	SDL_Texture ** ud;
+	SDL_Texture * texture;
+		
+
+	// Check arguments.
+	if (lua_gettop(L) != 1) {
+		luaL_error(L, "texture_blendmode_blend takes 1 argument: texture as light userdata");
+	}
+	if (lua_type(L, 1) != LUA_TUSERDATA) {
+		luaL_error(L, "first argument to texture_blendmode_blend should be light userdata");
+	}
+
+	ud = (SDL_Texture **) lua_touserdata(L, 1);
+	if (ud == NULL) {
+		luaL_error(L, "userdata pointer unexpectedly null in texture_blendmode_blend");
+	}
+
+	texture = *ud;
+	if (texture == NULL) {
+		luaL_error(L, "texture_blendmode_blend called with null value");
+	}
+	if (SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND)) {
+		luaL_error(L, SDL_GetError());
+	}
+	return 0;
+}
+
 void register_texture_functions(lua_State * L) {
-	lua_register(L, "texture_from_file" , texture_from_file );
-	lua_register(L, "texture_from_font" , texture_from_font );
-	lua_register(L, "destroy_texture"   , destroy_texture   );
-	lua_register(L, "render_texture"    , render_texture    );
+	lua_register(L, "texture_from_file"       , texture_from_file       );
+	lua_register(L, "texture_from_font"       , texture_from_font       );
+	lua_register(L, "destroy_texture"         , destroy_texture         );
+	lua_register(L, "render_texture"          , render_texture          );
+	lua_register(L, "texture_blendmode_blend" , texture_blendmode_blend );
 }

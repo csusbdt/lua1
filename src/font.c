@@ -81,8 +81,50 @@ static int close_font(lua_State * L) {
 	return 0;
 }
 
+static int font_texture_size(lua_State * L) {
+	TTF_Font ** ud;
+	TTF_Font * font;
+	const char * text;
+	int w;
+	int h;
+
+	// Check arguments.
+	if (lua_gettop(L) != 2) {
+		luaL_error(L, "texture_font_size takes 2 arguments: texture userdata and string");
+	}
+	if (lua_type(L, 1) != LUA_TUSERDATA) {
+		luaL_error(L, "first argument to texture_font_size should be light userdata");
+	}
+	if (lua_type(L, 2) != LUA_TSTRING) {
+		luaL_error(L, "second argument to texture_font_size should be a string");
+	}
+
+	// Extract arguments.
+	ud = (TTF_Font **) lua_touserdata(L, 1);
+	if (ud == NULL) {
+		luaL_error(L, "userdata pointer unexpectedly null in font_texture_size");
+	}
+	font = *ud;
+	if (font == NULL) {
+		luaL_error(L, "font_texture_size called with null value");
+	}
+	text = luaL_checkstring(L, 2);
+	if (text == NULL) {
+		luaL_error(L, "luaL_checkstring returned NULL in texture_font_size");
+	}
+
+	// Determine and return texture width and height.
+	if (TTF_SizeUTF8(font, text, &w, &h)) {
+		luaL_error(L, "%s", TTF_GetError());
+	}
+	lua_pushinteger(L, w);
+	lua_pushinteger(L, h);
+	return 2;
+}
+
 void register_font_functions(lua_State * L) {
-	lua_register(L, "open_font"  , open_font  );
-	lua_register(L, "close_font" , close_font );
+	lua_register(L, "open_font"         , open_font         );
+	lua_register(L, "close_font"        , close_font        );
+	lua_register(L, "font_texture_size" , font_texture_size );
 }
 
