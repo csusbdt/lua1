@@ -1,5 +1,10 @@
 #include "global.h"
 
+// Add the following as a function callable by lua.
+	//if (SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND)) {
+	//	return sdl_error_2(L);
+	//}
+
 extern SDL_Renderer * renderer;
 TTF_Font * get_font(lua_State * L, int stack_pos);
 
@@ -12,15 +17,13 @@ static int texture_from_surface(lua_State * L, SDL_Surface * surface) {
 	
 	texture = SDL_CreateTextureFromSurface(renderer, surface);
 	SDL_FreeSurface(surface);
-	if (!texture) return sdl_error_2(L);
-
-	//if (SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND)) {
-	//	return sdl_error_2(L);
-	//}
+	if (!texture) {
+		luaL_error(L, "%s", SDL_GetError());
+	}
 
 	ud = (SDL_Texture **) lua_newuserdata(L, sizeof(SDL_Texture *));
 	if (ud == NULL) {
-		return app_error_2(L, "Failed to create userdata in texture_from_surface.");
+		luaL_error(L, "Failed to create userdata in texture_from_surface.");
 	}
 
 	*ud = texture;
@@ -34,56 +37,76 @@ static int texture_from_file(lua_State * L) {
 	const char * filename;
 	SDL_Surface * surface;
 	SDL_RWops * file;
-		
-	// Check number of arguments.
+
+	// Check arguments.
 	if (lua_gettop(L) != 1) {
-		lua_settop(L, 0);
-		lua_pushnil(L);
-		lua_pushstring(L, "texture_from_file takes 1 argument: filename");
-		return 2;
+		luaL_error(L, "texture_from_file takes 1 argument: filename");
+	}
+	if (lua_type(L, 1) != LUA_TSTRING) {
+		luaL_error(L, "first argument to texture_from_file should be a filename");
 	}
 
-	// Check argument type.
-	if (lua_type(L, 1) != LUA_TSTRING) {
-		lua_settop(L, 0);
-		lua_pushnil(L);
-		lua_pushstring(L, "argument to texture_from_file should be a filename");
-		return 2;
-	}
+	// Extract arguments.
 	filename = luaL_checkstring(L, 1);
 
 	// Open file.
 	file = SDL_RWFromFile(resource_path(filename), "rb");
 	if (!file) {
-		lua_settop(L, 0);
-		lua_pushnil(L);
-		lua_pushstring(L, SDL_GetError());
-		return 2;
+		luaL_error(L, "%s", SDL_GetError());
 	}
 
 	// Load image data.
 	surface = IMG_Load_RW(file, 1);
 	if (!surface) {
-		lua_settop(L, 0);
-		lua_pushnil(L);
-		lua_pushstring(L, IMG_GetError());
-		return 2;
+		luaL_error(L, "%s", IMG_GetError());
 	}
 
 	return texture_from_surface(L, surface);
 }
 
+/*
+	Possible ways to call texture_from_font from Lua:
+
+	texture_from_font(ud, text)
+	texture_from_font(ud, text, r, g, b)
+	texture_from_font(ud, text, r, g, b, a)
+*/
 static int texture_from_font(lua_State * L) {
 	TTF_Font * font;
 	SDL_Surface * surface;
 	const char * text;
 	SDL_Color color;
 	
+	// Check arguments.
+	if (lua_gettop(L) != 2 && lua_gettop(L) != 5 && lua_gettop(L) != 6) {
+		luaL_error(L, "wrong number of arguments passed to texture_from_font");
+	}
+	if (lua_type(L, 1) != LUA_TUSERDATA) {
+		luaL_error(L, "first argument to texture_from_font should be userdata");
+	}
+	if (lua_type(L, 2) != LUA_TSTRING) {
+		luaL_error(L, "second argument to texture_from_font should be a string");
+	}
+	if (lua_gettop(L) == 5 || lua_gettop(L) == 6) {
+		if (lua_type(L, 3) != LUA_TNUMBER) {
+			luaL_error(L, "third argument to texture_from_font should be an integer");
+		}
+		if (lua_type(L, 4) != LUA_TNUMBER) {
+			luaL_error(L, "fourth argument to texture_from_font should be an integer");
+		}
+		if (lua_type(L, 5) != LUA_TNUMBER) {
+			luaL_error(L, "fifth argument to texture_from_font should be an integer");
+		}
+		if (lua_gettop(L) == 6 && lua_type(L, 6) != LUA_TNUMBER) {
+			luaL_error(L, "sixth argument to texture_from_font should be an integer");
+		}
+	}
+
+	// Extract arguments.
 	font = get_font(L, 1);
 	text = luaL_checkstring(L, 2);
 	if (strlen(text) == 0) {
-		lua_pushnil(L);
-		return 1;
+		luaL_error(L, "Empty string passed to texture_from_font");
 	}
 	color = APP_WHITE;
 	if (lua_gettop(L) >= 5) {
@@ -102,35 +125,37 @@ static int destroy_texture(lua_State * L) {
 	SDL_Texture ** ud;
 	SDL_Texture * texture;
 		
-	// Check number of arguments.
+
+	// Check arguments.
 	if (lua_gettop(L) != 1) {
-		return app_error_1(L, "destroy_texture called with wrong number of arguments");
+		luaL_error(L, "destroy_texture takes 1 argument: texture as light userdata");
+	}
+	if (lua_type(L, 1) != LUA_TUSERDATA) {
+		luaL_error(L, "first argument to destroy_texture should be light userdata");
 	}
 
-	// Check argument type.
-	if (lua_type(L, 1) != LUA_TUSERDATA) {
-		return app_error_1(L, "Argument to destroy_texture not userdata.");
-	}
-	
 	ud = (SDL_Texture **) lua_touserdata(L, 1);
-	if (!ud) {
-		return sdl_error_1(L);
+	if (ud == NULL) {
+		luaL_error(L, "userdata pointer unexpectedly null");
 	}
 
 	texture = *ud;
+	if (texture == NULL) {
+		luaL_error(L, "destroy_texture called with null value");
+	}
 	SDL_DestroyTexture(texture);
+	*ud = NULL;
 	return 0;
 }
 
 /*
-	Possible ways to call this function from Lua:
+	Possible ways to call render_texture from Lua:
 
 	render_texture(ud)
 	render_texture(ud, dst_x, dst_y) 
 	render_texture(ud, dst_x, dst_y, dst_w, dst_h) 
 	render_texture(ud, src_x, src_y, src_w, src_h, dst_x, dst_y) 
 	render_texture(ud, src_x, src_y, src_w, src_h, dst_x, dst_y, dst_w, dst_h) 
-	
 */
 static int render_texture(lua_State * L) {
 	int numargs;

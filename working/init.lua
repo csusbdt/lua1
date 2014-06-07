@@ -1,33 +1,8 @@
 dofile('tests/fonts.lua')
+dofile('tests/textures.lua')
 
 
 --[[
--- Test fonts.
-
-local f, f2, t, t2, w, w2, wi, w2i
-
-f, err = open_font('fonts/I_dont_exist.ttf')
-assert(not f and type(err) == 'string')
-
-f, err = open_font('fonts/I_dont_exist.ttf', 24)
-assert(not f and type(err) == 'string')
-
-f, err = open_font(24, 'fonts/DroidSansMono.ttf')
-assert(not f and type(err) == 'string')
-
-f, err = open_font('fonts/DroidSansMono.ttf', 'not a number')
-assert(not f and type(err) == 'string')
-
---close_font() -- This opens a popup from the engine side.
---close_font('not userdata') -- This opens a popup from the engine side.
-
-f, err = open_font('fonts/DroidSansMono.ttf', 24)
-assert(type(f) == 'userdata' and not err)
-
-f2, err = open_font('fonts/DroidSansMono.ttf', 24)
-assert(type(f2) == 'userdata')
-assert(f ~= f2)
-close_font(f2)
 
 -- Test textures.
 
