@@ -35,59 +35,6 @@ void fatal(const char * fmt, ...) {
 	exit(1);
 }
 
-/*
-// Push error string onto stack.
-int app_error_1(lua_State * L, const char * fmt, ...) {
-	va_list v;
-	char buf[1024];
-
-	va_start(v, fmt);
-	vsnprintf(buf, 1024, fmt, v);
-	va_end(v);
-	lua_settop(L, 0);
-	lua_pushstring(L, buf);
-	return 1;
-}
-
-// Push nil and error string onto stack.
-int app_error_2(lua_State * L, const char * fmt, ...) {
-	va_list v;
-	char buf[1024];
-
-	va_start(v, fmt);
-	vsnprintf(buf, 1024, fmt, v);
-	va_end(v);
-	lua_settop(L, 0);
-	lua_pushnil(L);
-	lua_pushstring(L, buf);
-	return 2;
-}
-
-int sdl_error_1(lua_State * L) {
-	return app_error_1(L, "%s", SDL_GetError());
-}
-
-int sdl_error_2(lua_State * L) {
-	return app_error_2(L, "%s", SDL_GetError());
-}
-
-int ttf_error_1(lua_State * L) {
-	return app_error_1(L, "%s", TTF_GetError());
-}
-
-int ttf_error_2(lua_State * L) {
-	return app_error_2(L, "%s", TTF_GetError());
-}
-
-int img_error_1(lua_State * L) {
-	return app_error_1(L, "%s", IMG_GetError());
-}
-
-int img_error_2(lua_State * L) {
-	return app_error_2(L, "%s", IMG_GetError());
-}
-*/
-
 #define MAX_PATH 256
 static char dir[MAX_PATH];
 

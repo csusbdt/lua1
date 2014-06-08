@@ -33,16 +33,6 @@ bool is_windows();
 bool is_linux();
 void fatal(const char * fmt, ...);
 int windowed(lua_State * L);
-/*
-int app_error_1(lua_State * L, const char * fmt, ...);
-int app_error_2(lua_State * L, const char * fmt, ...);
-int sdl_error_1(lua_State * L);
-int sdl_error_2(lua_State * L);
-int img_error_1(lua_State * L);
-int img_error_2(lua_State * L);
-int ttf_error_1(lua_State * L);
-int ttf_error_2(lua_State * L);
-*/
 
 const char * resource_path(const char * path);
 const char * save_path(const char * path);
