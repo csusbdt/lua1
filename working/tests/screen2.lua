@@ -14,6 +14,6 @@ function on_update()
 end
 
 function on_touch()
-	quit()
+	dofile('tests/screen3.lua')
 end
 

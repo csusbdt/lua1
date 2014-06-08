@@ -35,6 +35,7 @@ void fatal(const char * fmt, ...) {
 	exit(1);
 }
 
+/*
 // Push error string onto stack.
 int app_error_1(lua_State * L, const char * fmt, ...) {
 	va_list v;
@@ -85,6 +86,7 @@ int img_error_1(lua_State * L) {
 int img_error_2(lua_State * L) {
 	return app_error_2(L, "%s", IMG_GetError());
 }
+*/
 
 #define MAX_PATH 256
 static char dir[MAX_PATH];

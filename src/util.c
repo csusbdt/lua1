@@ -7,7 +7,7 @@ static int fullscreen(lua_State * L) {
 	if (app_fullscreen) return 0;
 	app_fullscreen = true;
 	if (SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP)) {
-		fatal(SDL_GetError());
+		luaL_error(L, "%s", SDL_GetError());
 	}
 	SDL_RaiseWindow(window);
 	return 0;
@@ -18,7 +18,7 @@ int windowed(lua_State * L) {
 	if (!app_fullscreen) return 0;
 	app_fullscreen = false;
 	if (SDL_SetWindowFullscreen(window, 0)) {
-		fatal(SDL_GetError());
+		luaL_error(L, "%s", SDL_GetError());
 	}
 	SDL_SetWindowSize(window, app_width, app_height);
 	SDL_RaiseWindow(window);
@@ -57,7 +57,9 @@ static int draw_line(lua_State * L) {
 	y1 = luaL_checkinteger(L, 2);
 	x2 = luaL_checkinteger(L, 3);
 	y2 = luaL_checkinteger(L, 4);
-	if (SDL_RenderDrawLine(renderer, x1, y1, x2, y2)) fatal(SDL_GetError());
+	if (SDL_RenderDrawLine(renderer, x1, y1, x2, y2)) {
+		luaL_error(L, "%s", SDL_GetError());
+	}
 	return 0;
 }
 
@@ -68,7 +70,9 @@ static int fill_rect(lua_State * L) {
 	rect.y = luaL_checkinteger(L, 2);
 	rect.w  = luaL_checkinteger(L, 3);
 	rect.h  = luaL_checkinteger(L, 4);
-	if (SDL_RenderFillRect(renderer, &rect)) fatal(SDL_GetError());
+	if (SDL_RenderFillRect(renderer, &rect)) {
+		luaL_error(L, "%s", SDL_GetError());
+	}
 	return 0;
 }
 
@@ -110,17 +114,14 @@ static int read_string(lua_State * L, bool from_resource_path) {
 	}
 	len = SDL_RWseek(file, 0, SEEK_END);
 	if (len < 0) {
-		lua_pushstring(L, "Failed to seek to end of file.");
-		lua_error(L);
+		luaL_error(L, "Failed to seek to end of file.");
 	}
 	if (SDL_RWseek(file, 0, RW_SEEK_SET) < 0) {
-		lua_pushstring(L, "Failed to seek to beginning of file.");
-		lua_error(L);
+		luaL_error(L, "Failed to seek to beginning of file.");
 	}
 	buf = SDL_malloc(len);
 	if (!buf) {
-		lua_pushstring(L, "Probably not enough memory to store file.");
-		lua_error(L);
+		luaL_error(L, "Malloc failed in read_string.");
 	}
 	SDL_RWread(file, buf, len, 1);
 	SDL_RWclose(file);
@@ -152,14 +153,10 @@ static int write_file(lua_State * L) {
 	}
 	file = SDL_RWFromFile(save_path(filename), "wb");
 	if (!file) {
-		lua_settop(L, 0);
-		lua_pushstring(L, "Failed to open file for writing.");
-		lua_error(L);
+		luaL_error(L, "%s", SDL_GetError());
 	}
 	if (data && SDL_RWwrite(file, data, 1, len) != len) {
-		lua_settop(L, 0);
-		lua_pushstring(L, "Failed to write file.");
-		lua_error(L);
+		luaL_error(L, "%s", SDL_GetError());
 	}
 	SDL_RWclose(file);
 	return 0;
