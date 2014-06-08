@@ -1,3 +1,51 @@
+/*
+	AUDIO SYSTEM DESIGN
+
+	This system uses the word "wave" to represent a sequence of audio samples
+	residing in memory. Waves are represented by instances of the Wave struct.
+
+	There are 2 ways to render a wave: as a single play instance or as a loop.
+	A play instance means the audio samples are rendered once; a loop instance
+	means the audio samples are rendered over and over.  A play instance comes
+	to a natural end; there is no way to terminate a play instance early. A
+	loop instance must be explicitly stopped.
+
+	Play instances are represented by instances of the PlayInstance struct.
+	Loop instances are represented by instances of the LoopInstance struct.
+
+	Wave instances are reference counted.  The reference count is incremented
+	when the wave instance is first created and decremented when destroyed.
+	Wave instances are created from Lua with the following function.
+
+		wave = wave_from_file(filename)
+
+	Wave instances are destroyed from Lua with the following function.
+
+		destroy_wave(wave)
+
+	Wave instances are played from Lua with the following.
+
+		play_wave(wave)
+
+	The play_wave function increments the wave's reference count. When the
+	play instance comes to its natural end, the corresponding reference
+	count is decremented.  This allows code to destroy a wave while it is
+	playing.
+
+	Wave instances are looped from Lua with the following.
+
+		loop_instance = loop_wave(wave)
+
+	Loop instances are stopped from Lua with the following.
+
+		stop_loop(loop_instance)
+
+	The loop_wave function increments the reference count of its underlying
+	wave and the stop_loop function decrements the reference count.
+
+	Waves are deleted when their reference counts go to zero.
+*/
+
 #include "global.h"
 
 #define MAX_AUDIO_SOURCES  4
