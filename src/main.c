@@ -157,11 +157,6 @@ static void init() {
 
 	config();
 
-	img_support = IMG_INIT_PNG | IMG_INIT_JPG;
-	if ((IMG_Init(img_support) & img_support) != img_support) {
-		fatal("Required image support missing.");
-	}
-
 	if (is_ios()) {
 		                    window_flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
 	} else if (is_android()) {

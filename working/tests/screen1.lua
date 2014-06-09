@@ -10,17 +10,16 @@ local t3 = texture_from_font(f, s, 100, 255, 25, 40)
 local w, h = font_texture_size(f, s)
 
 local cara, cw, ch = texture_from_file('textures/Cara.png')
-local jpg, cw, ch = texture_from_file('textures/Cara.jpg')
+local jpg, jw, jh = texture_from_file('textures/nature-wallpaper-1.jpg')
 
-texture_alpha_mod(cara, 100)
+--texture_alpha_mod(cara, 100)
 texture_alpha_mod(t1, 100)
 texture_alpha_mod(t2, 100)
 texture_alpha_mod(t3, 100)
 
 function on_update()
 	local y = 50
-	blendmode_blend()
-	render_texture(jpg, 50, 50) 
+	render_texture(jpg) 
 	render_texture(cara, 70, 50) 
 	render_texture(t1, 50, y); y = y + h
 	render_texture(t2, 50, y); y = y + h

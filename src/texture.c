@@ -1,14 +1,24 @@
 #include "global.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 extern SDL_Renderer * renderer;
 TTF_Font * get_font(lua_State * L, int stack_pos);
 
 static int texture_from_file(lua_State * L) {
-	const char * filename;
-	SDL_Texture * texture;
-	SDL_Texture ** ud;
-	int w;
-	int h;
+	const char     * filename;
+	SDL_Texture    * texture;
+	SDL_Texture   ** ud;
+	int              w;
+	int              h;
+	int              bytes_per_pixel;
+	Uint32           rmask;
+	Uint32           gmask;
+	Uint32           bmask;
+	Uint32           amask;
+	unsigned char  * pixels;
+	SDL_Surface    * surface;
 
 	// Check arguments.
 	if (lua_gettop(L) != 1) {
@@ -21,18 +31,48 @@ static int texture_from_file(lua_State * L) {
 	// Extract arguments.
 	filename = luaL_checkstring(L, 1);
 
-	texture = IMG_LoadTexture(renderer, filename);
-	if (!texture) {
-		luaL_error(L, "%s", IMG_GetError());
+	// Load pixel data.
+	pixels = stbi_load(filename, &w, &h, &bytes_per_pixel, 0);
+	if (pixels == NULL) {
+		luaL_error(L, "%s", stbi_failure_reason());
 	}
 
+	// Create SDL surface from pixel data.
+	#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+		rmask = 0xff000000;
+		gmask = 0x00ff0000;
+		bmask = 0x0000ff00;
+		amask = 0x000000ff;
+	#else
+		rmask = 0x000000ff;
+		gmask = 0x0000ff00;
+		bmask = 0x00ff0000;
+		amask = 0xff000000;
+	#endif
+	if (bytes_per_pixel == 4) {
+		surface = SDL_CreateRGBSurface(0, w, h, 32, rmask, gmask, bmask, amask);
+	} else if (bytes_per_pixel == 3) {
+		surface = SDL_CreateRGBSurface(0, w, h, 24, rmask, gmask, bmask, 0);
+	} else {
+		stbi_image_free(pixels);
+		luaL_error(L, "Pixel format not supported.");
+	}
+	memcpy(surface->pixels, pixels, bytes_per_pixel * w * h);
+	stbi_image_free(pixels);
+
+	// Create texture from surface.
+	texture = SDL_CreateTextureFromSurface(renderer, surface);
+	if (texture == NULL) {
+		luaL_error(L, "%s", SDL_GetError());
+	}
+	SDL_FreeSurface(surface);
+
+	// Return texture pointer, width and height.
 	ud = (SDL_Texture **) lua_newuserdata(L, sizeof(SDL_Texture *));
 	if (ud == NULL) {
 		luaL_error(L, "Failed to create userdata in texture_from_file.");
 	}
-
 	*ud = texture;
-	SDL_QueryTexture(texture, NULL, NULL, &w, &h);
 	lua_pushinteger(L, w);
 	lua_pushinteger(L, h);
 	return 3;
