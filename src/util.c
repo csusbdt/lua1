@@ -30,6 +30,11 @@ static int quit(lua_State * L) {
 	return 0;
 }
 
+static int get_ticks(lua_State * L) {
+        lua_pushnumber(L, SDL_GetTicks());
+        return 1;
+}
+
 static int msgbox(lua_State * L) {
 	const char * msg;
 	
@@ -166,6 +171,7 @@ void register_util_functions(lua_State * L) {
 	lua_register(L, "fullscreen"      , fullscreen      );
 	lua_register(L, "windowed"        , windowed        );
 	lua_register(L, "quit"            , quit            );
+	lua_register(L, "get_ticks"       , get_ticks       );
 	lua_register(L, "msgbox"          , msgbox          );
 	lua_register(L, "set_draw_color"  , set_draw_color  );
 	lua_register(L, "blendmode_none"  , blendmode_none  );
