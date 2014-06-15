@@ -1,21 +1,10 @@
-local cara, w, h = texture_from_file('textures/Cara.png')
 local f = open_font('fonts/DroidSansMono.ttf', 28)
-local t1 = texture_from_font(f, "Clické for next test.")
-local t2 = texture_from_font(f, "Clické for next test.", 100, 255, 25)
-local t3 = texture_from_font(f, "Clické for next test.", 100, 255, 25, 40)
+local cara, w, h
+local t1, t2, t3
 
-function on_update()
-	render_texture(cara, 50, 50) 
-	render_texture(t1, 50, 50) 
-	render_texture(t2, 50, 80) 
-	render_texture(t3, 50, 110) 
-end
-
-function on_touch()
-	quit()
-end
-
-function on_update()
+function on_render_targets_reset()
+	set_draw_color(0, 0, 0, 255)
+	fill_rect(0, 0, app_width, app_height)
 	render_texture(cara)
 	render_texture(cara, 100, 100)
 	render_texture(cara, 200, 200, 32, 32)
@@ -29,5 +18,23 @@ function on_update()
 	blendmode_none()
 	set_draw_color(255, 0, 0, 75)
 	fill_rect(350, 220, 50, 75)
+	render()
 end
+
+function on_device_reset()
+	cara, w, h = texture_from_file('textures/Cara.png')
+	t1 = texture_from_font(f, "Clické for next test.")
+	t2 = texture_from_font(f, "Clické for next test.", 100, 255, 25)
+	t3 = texture_from_font(f, "Clické for next test.", 100, 255, 25, 40)
+	on_render_targets_reset()
+end
+
+function on_update()
+end
+
+function on_touch()
+	quit()
+end
+
+on_device_reset()
 

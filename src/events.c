@@ -6,6 +6,18 @@ static void on_window_closing(lua_State * L) {
 	if (lua_pcall(L, 0, 0, 0)) fatal(lua_tostring(L, -1));
 }
 
+void on_device_reset(lua_State * L) { // Called from main.
+	lua_getglobal(L, "on_device_reset");
+	if (lua_isnil(L, 1)) return;
+	if (lua_pcall(L, 0, 0, 0)) fatal(lua_tostring(L, -1));
+}
+
+void on_render_targets_reset(lua_State * L) { // Called from main.
+	lua_getglobal(L, "on_render_targets_reset");
+	if (lua_isnil(L, 1)) return;
+	if (lua_pcall(L, 0, 0, 0)) fatal(lua_tostring(L, -1));
+}
+
 static void on_mouse_down(lua_State * L, const SDL_MouseButtonEvent * e) {
 	if (e->type == SDL_MOUSEBUTTONDOWN && e->button == SDL_BUTTON_LEFT) {
 		SDL_assert(lua_gettop(L) == 0);

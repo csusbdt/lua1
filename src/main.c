@@ -1,6 +1,8 @@
 #include "global.h"
 
 bool process_event_queue(lua_State * L);
+void on_device_reset(lua_State * L);
+void on_render_targets_reset(lua_State * L);
 
 bool		  running 	 = true;
 SDL_Window	* window	 = NULL;
@@ -53,6 +55,10 @@ int SDLCALL eventFilter(void * userdata, SDL_Event * event)
 		lua_gc(L, LUA_GCCOLLECT, 0);
 	} else if (event->type == SDL_APP_TERMINATING) {
 		running = false;
+	} else if (event->type == SDL_RENDER_DEVICE_RESET) {
+		on_device_reset(L);
+	} else if (event->type == SDL_RENDER_TARGETS_RESET) {
+		on_render_targets_reset(L);
 	} else {
 		// This is not a special case event to handle, 
 		// so return 1 to let it go onto the event queue.
@@ -207,14 +213,14 @@ static void init() {
 */
 static void update() {
 	SDL_assert(lua_gettop(L) == 0);
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-	SDL_RenderClear(renderer);
+//	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+//	SDL_RenderClear(renderer);
 	lua_getglobal(L, "on_update");
 	if (!lua_isnil(L, 1)) {
 		if (lua_pcall(L, 0, 0, 0)) fatal(lua_tostring(L, -1));
 	}
 	lua_settop(L, 0);
-	SDL_RenderPresent(renderer);
+//	SDL_RenderPresent(renderer);
 }
 
 /*
