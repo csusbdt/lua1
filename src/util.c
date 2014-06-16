@@ -9,7 +9,6 @@ static int fullscreen(lua_State * L) {
 	if (SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP)) {
 		luaL_error(L, "%s", SDL_GetError());
 	}
-	SDL_RaiseWindow(window);
 	return 0;
 }
 
@@ -21,7 +20,6 @@ int windowed(lua_State * L) {
 		luaL_error(L, "%s", SDL_GetError());
 	}
 	SDL_SetWindowSize(window, app_width, app_height);
-	SDL_RaiseWindow(window);
 	return 0;
 }
 
