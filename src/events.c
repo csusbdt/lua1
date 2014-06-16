@@ -45,6 +45,32 @@ static void on_key_down(lua_State * L, const SDL_KeyboardEvent * e) {
 	if (lua_pcall(L, 1, 0, 0)) fatal(lua_tostring(L, -1));
 }
 
+static void on_window_event(lua_State * L, Uint8 id) {
+	SDL_assert(lua_gettop(L) == 0);
+	if (id == SDL_WINDOWEVENT_EXPOSED) {
+		lua_getglobal(L, "on_window_exposed");
+		if (lua_isnil(L, 1)) {
+			lua_settop(L, 0);
+			return;
+		}
+		if (lua_pcall(L, 0, 0, 0)) fatal(lua_tostring(L, -1));
+	} else if (id == SDL_WINDOWEVENT_SIZE_CHANGED) {
+		lua_getglobal(L, "on_window_size_changed");
+		if (lua_isnil(L, 1)) {
+			lua_settop(L, 0);
+			return;
+		}
+		if (lua_pcall(L, 0, 0, 0)) fatal(lua_tostring(L, -1));
+	} else if (id == SDL_WINDOWEVENT_RESTORED) {
+		lua_getglobal(L, "on_window_restored");
+		if (lua_isnil(L, 1)) {
+			lua_settop(L, 0);
+			return;
+		}
+		if (lua_pcall(L, 0, 0, 0)) fatal(lua_tostring(L, -1));
+	}
+}
+
 bool process_event_queue(lua_State * L) {
 	SDL_Event e;
 
@@ -52,6 +78,7 @@ bool process_event_queue(lua_State * L) {
 		if      (e.type == SDL_QUIT)          { on_window_closing(L);  return false; } 
 		else if (e.type == SDL_MOUSEBUTTONDOWN) on_mouse_down(L, &e.button);
 		else if (e.type == SDL_KEYDOWN)         on_key_down(L, &e.key);
+		else if (e.type == SDL_WINDOWEVENT)     on_window_event(L, e.window.event);
 	}
 	lua_settop(L, 0);
 	return true;
