@@ -53,6 +53,15 @@ static int set_draw_color(lua_State * L) {
 	return 0;
 }
 
+static int set_window_size(lua_State * L) {
+	int w, h;
+
+	w = luaL_checkinteger(L, 1);
+	h = luaL_checkinteger(L, 2);
+	SDL_SetWindowSize(window, w, h);
+	return 0;
+}
+
 static int draw_line(lua_State * L) {
 	int x1, y1, x2, y2;
 
@@ -178,6 +187,7 @@ static int write_file(lua_State * L) {
 void register_util_functions(lua_State * L) {
 	lua_register(L, "fullscreen"      , fullscreen      );
 	lua_register(L, "windowed"        , windowed        );
+	lua_register(L, "set_window_size" , set_window_size );
 	lua_register(L, "quit"            , quit            );
 	lua_register(L, "get_ticks"       , get_ticks       );
 	lua_register(L, "msgbox"          , msgbox          );
