@@ -1,7 +1,7 @@
 #include "global.h"
 
 bool process_event_queue(lua_State * L);
-void on_device_reset(lua_State * L);
+void on_render_device_reset(lua_State * L);
 void on_render_targets_reset(lua_State * L);
 
 bool		  running 	 = true;
@@ -56,7 +56,7 @@ int SDLCALL eventFilter(void * userdata, SDL_Event * event)
 	} else if (event->type == SDL_APP_TERMINATING) {
 		running = false;
 	} else if (event->type == SDL_RENDER_DEVICE_RESET) {
-		on_device_reset(L);
+		on_render_device_reset(L);
 	} else if (event->type == SDL_RENDER_TARGETS_RESET) {
 		on_render_targets_reset(L);
 	} else {
@@ -213,14 +213,11 @@ static void init() {
 */
 static void update() {
 	SDL_assert(lua_gettop(L) == 0);
-//	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-//	SDL_RenderClear(renderer);
 	lua_getglobal(L, "on_update");
 	if (!lua_isnil(L, 1)) {
 		if (lua_pcall(L, 0, 0, 0)) fatal(lua_tostring(L, -1));
 	}
 	lua_settop(L, 0);
-//	SDL_RenderPresent(renderer);
 }
 
 /*

@@ -15,7 +15,7 @@ function on_render_targets_reset()
 	render()
 end
 
-function on_device_reset()
+function on_render_device_reset()
 	t1 = texture_from_font(f, s)
 	t2 = texture_from_font(f, s, 100, 255, 25)
 	t3 = texture_from_font(f, s, 100, 255, 25, 40)
@@ -34,5 +34,5 @@ function on_touch()
 	dofile('tests/screen2.lua')
 end
 
-on_device_reset()
+on_render_device_reset()
 

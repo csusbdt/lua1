@@ -4,13 +4,13 @@ local full, wind
 
 function on_render_targets_reset()
 	set_draw_color(0, 0, 0, 255)
-	fill_rect(0, 0, app_width, app_height)
+	render_clear()
 	render_texture(full, 100, 100)
 	render_texture(wind, 100, 150)
 	render()
 end
 
-function on_device_reset()
+function on_render_device_reset()
 	full = texture_from_font(f, "Press F for fullscreen")
 	wind = texture_from_font(f, "Press ESC for windowed")
 	on_render_targets_reset()
@@ -28,5 +28,5 @@ end
 function on_update()
 end
 
-on_device_reset()
+on_render_device_reset()
 

@@ -4,7 +4,7 @@ local t1, t2, t3
 
 function on_render_targets_reset()
 	set_draw_color(0, 0, 0, 255)
-	fill_rect(0, 0, app_width, app_height)
+	render_clear()
 	render_texture(cara)
 	render_texture(cara, 100, 100)
 	render_texture(cara, 200, 200, 32, 32)
@@ -21,7 +21,7 @@ function on_render_targets_reset()
 	render()
 end
 
-function on_device_reset()
+function on_render_device_reset()
 	cara, w, h = texture_from_file('textures/Cara.png')
 	t1 = texture_from_font(f, "Clické for next test.")
 	t2 = texture_from_font(f, "Clické for next test.", 100, 255, 25)
@@ -36,5 +36,5 @@ function on_touch()
 	quit()
 end
 
-on_device_reset()
+on_render_device_reset()
 

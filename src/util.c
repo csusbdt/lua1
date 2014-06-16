@@ -106,6 +106,11 @@ static int render(lua_State * L) {
 	return 0;
 }
 
+static int render_clear(lua_State * L) {
+	SDL_RenderClear(renderer);
+	return 0;
+}
+
 static int read_string(lua_State * L, bool from_resource_path) {
 	const char * filename;
 	SDL_RWops * file;
@@ -186,6 +191,7 @@ void register_util_functions(lua_State * L) {
 	lua_register(L, "draw_line"       , draw_line       );
 	lua_register(L, "fill_rect"       , fill_rect       );
 	lua_register(L, "render"          , render          );
+	lua_register(L, "render_clear"    , render_clear    );
 	lua_register(L, "read_file"       , read_file       );
 	lua_register(L, "write_file"      , write_file      );
 	lua_register(L, "load_chunk"      , load_chunk      );
