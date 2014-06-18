@@ -117,6 +117,16 @@ static int blendmode_mod(lua_State * L) {
 	return 0;
 }
 
+static int set_hint_render_scale_quality_nearest(lua_State * L) {
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+	return 0;
+}
+
+static int set_hint_render_scale_quality_linear(lua_State * L) {
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+	return 0;
+}
+
 static int render(lua_State * L) {
 	SDL_RenderPresent(renderer);
 	return 0;
@@ -206,6 +216,8 @@ void register_util_functions(lua_State * L) {
 	lua_register(L, "blendmode_blend" , blendmode_blend );
 	lua_register(L, "blendmode_add"   , blendmode_add   );
 	lua_register(L, "blendmode_mod"   , blendmode_mod   );
+	lua_register(L, "set_hint_render_scale_quality_linear"  , set_hint_render_scale_quality_linear  );
+	lua_register(L, "set_hint_render_scale_quality_nearest" , set_hint_render_scale_quality_nearest );
 	lua_register(L, "draw_line"       , draw_line       );
 	lua_register(L, "fill_rect"       , fill_rect       );
 	lua_register(L, "render"          , render          );

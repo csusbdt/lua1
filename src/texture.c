@@ -67,6 +67,9 @@ static int texture_from_file(lua_State * L) {
 	}
 	SDL_FreeSurface(surface);
 
+	// Set the blend mode for the texture.
+	SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+
 	// Return texture pointer, width and height.
 	ud = (SDL_Texture **) lua_newuserdata(L, sizeof(SDL_Texture *));
 	if (ud == NULL) {
@@ -310,4 +313,5 @@ void register_texture_functions(lua_State * L) {
 	lua_register(L, "destroy_texture"   , destroy_texture   );
 	lua_register(L, "render_texture"    , render_texture    );
 	lua_register(L, "texture_alpha_mod" , texture_alpha_mod );
+//	lua_register(L, "set_texture_blend_mode_to_blend" , set_texture_blend_mode_to_blend );
 }
