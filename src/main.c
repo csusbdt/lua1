@@ -139,8 +139,6 @@ static void init() {
 	char * base_path;
 	int img_support;
 	int window_flags;
-    
-	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
 
 	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
 		fatal(SDL_GetError());
@@ -168,14 +166,16 @@ static void init() {
 	} else if (is_android()) {
 		                    window_flags = SDL_WINDOW_OPENGL;
 	} else if (is_osx()) {
-		if (app_fullscreen) window_flags = SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP; // | SDL_WINDOW_RESIZABLE;
-		else                window_flags = SDL_WINDOW_OPENGL; // | SDL_WINDOW_RESIZABLE;
+		if (app_fullscreen) window_flags = SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_RESIZABLE;
+		else                window_flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
 	} else if (is_windows()) {
 		if (app_fullscreen) window_flags = SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP;
 		else                window_flags = SDL_WINDOW_OPENGL;
 	} else if (is_linux()) {
 		if (app_fullscreen) window_flags = SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP;
 		else                window_flags = SDL_WINDOW_OPENGL;
+	} else {
+		fatal("Platform not supported.");
 	}
 
 	window = SDL_CreateWindow(
@@ -187,14 +187,16 @@ static void init() {
 		window_flags);
 	if (!window) fatal(SDL_GetError());
 
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+
+	renderer = SDL_CreateRenderer(window, -1, 0);
 	if (!renderer) fatal(SDL_GetError());
 
 	if (SDL_RenderSetLogicalSize(renderer, app_width, app_height)) {
 		fatal(SDL_GetError());
 	}
 
-	SDL_RaiseWindow(window);
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
 
 	SDL_AddEventWatch(eventFilter, NULL);
 

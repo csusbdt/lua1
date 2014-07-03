@@ -3,6 +3,7 @@
 extern bool running;
 
 static int fullscreen(lua_State * L) {
+puts("fullscreen() called");
 	if (is_ios() || is_android()) return 0;
 	if (app_fullscreen) return 0;
 	app_fullscreen = true;
@@ -13,13 +14,13 @@ static int fullscreen(lua_State * L) {
 }
 
 int windowed(lua_State * L) {
+puts("windowed() called");
 	if (is_ios() || is_android()) return 0;
 	if (!app_fullscreen) return 0;
 	app_fullscreen = false;
 	if (SDL_SetWindowFullscreen(window, 0)) {
 		luaL_error(L, "%s", SDL_GetError());
 	}
-	SDL_SetWindowSize(window, app_width, app_height);
 	return 0;
 }
 

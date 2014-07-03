@@ -88,12 +88,18 @@ static int texture_from_surface(lua_State * L, SDL_Surface * surface) {
 	SDL_Texture ** ud;
 	int w;
 	int h;
+	SDL_BlendMode blend_mode;
 	
 	texture = SDL_CreateTextureFromSurface(renderer, surface);
 	SDL_FreeSurface(surface);
 	if (!texture) {
 		luaL_error(L, "%s", SDL_GetError());
 	}
+
+	if (SDL_GetTextureBlendMode(texture, &blend_mode)) {
+		luaL_error(L, "%s", SDL_GetError());
+	}
+	SDL_assert_release(blend_mode == SDL_BLENDMODE_BLEND);
 
 	ud = (SDL_Texture **) lua_newuserdata(L, sizeof(SDL_Texture *));
 	if (ud == NULL) {
