@@ -10,8 +10,11 @@ SDL_Renderer 	* renderer	 = NULL;
 char		* resource_dir 	 = NULL;
 char 		* save_dir 	 = NULL;
 int		  app_width 	 = 16 * 50;
-int		  app_height 	 = 9 * 50;
+int		  app_height 	 =  9 * 50;
+int		  window_w;
+int		  window_h;
 bool		  app_fullscreen = false;
+bool		  app_resizable  = false;
 char 		* app_title 	 = "No Title Set";
 
 static int 	  	  app_millis_per_update = 1000 / 60;
@@ -106,6 +109,17 @@ static void config() {
 		lua_settop(L, 0);
 	}
 
+	// app_resizable
+	if (!is_ios() && !is_android()) {
+		lua_getglobal(L, "app_resizable");
+		if (!lua_isnil(L, 1)) {
+			app_resizable = lua_toboolean(L, 1);
+		} else {
+			app_resizable = false;
+		}
+		lua_settop(L, 0);
+	}
+
 	// save_dir
 	lua_getglobal(L, "app_save_folder");
 	if (!lua_isnil(L, 1)) {
@@ -139,6 +153,8 @@ static void init() {
 	char * base_path;
 	int img_support;
 	int window_flags;
+	int client_area_w;
+	int client_area_h;
 
 	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
 		fatal(SDL_GetError());
@@ -161,29 +177,42 @@ static void init() {
 
 	config();
 
+	window_w = app_width;
+	window_h = app_height;
+
+	window_flags = SDL_WINDOW_OPENGL;
+
 	if (is_ios()) {
-		                    window_flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
+		window_flags |= SDL_WINDOW_RESIZABLE; // required to change orientation
 	} else if (is_android()) {
-		                    window_flags = SDL_WINDOW_OPENGL;
 	} else if (is_osx()) {
-		if (app_fullscreen) window_flags = SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_RESIZABLE;
-		else                window_flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
+		if (app_fullscreen) window_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+		if (app_resizable)  window_flags |= SDL_WINDOW_RESIZABLE;
 	} else if (is_windows()) {
-		if (app_fullscreen) window_flags = SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP;
-		else                window_flags = SDL_WINDOW_OPENGL;
+		if (app_fullscreen) window_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+		if (app_resizable)  window_flags |= SDL_WINDOW_RESIZABLE;
 	} else if (is_linux()) {
-		if (app_fullscreen) window_flags = SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP;
-		else                window_flags = SDL_WINDOW_OPENGL;
+		if (app_fullscreen) window_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+		if (app_resizable)  window_flags |= SDL_WINDOW_RESIZABLE;
 	} else {
 		fatal("Platform not supported.");
+	}
+
+	if (app_resizable) {
+		window = SDL_CreateWindow("", 0, 0, window_w, window_h, SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN);
+		if (!window) fatal(SDL_GetError());
+		SDL_GetWindowSize(window, &client_area_w, &client_area_h);
+		window_w = app_width + app_width - client_area_w;
+		window_h = app_height + app_height - client_area_h;
+		SDL_DestroyWindow(window);
 	}
 
 	window = SDL_CreateWindow(
 		app_title, 
 		SDL_WINDOWPOS_CENTERED,
 		SDL_WINDOWPOS_CENTERED,
-		app_width,
-		app_height,
+		window_w,
+		window_h,
 		window_flags);
 	if (!window) fatal(SDL_GetError());
 

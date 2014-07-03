@@ -14,8 +14,6 @@ local name_texture
 local name_texture_w
 local name_texture_h
 
---local w, h = font_texture_size(f, s)
-
 function load_textures()
 	diamond_texture, diamond_texture_w, diamond_texture_h 
 		= texture_from_file('textures/UI-diamond-black.png')
@@ -26,7 +24,7 @@ function load_textures()
 end
 
 local function draw()
-	set_draw_color(255, 255, 255, 255)
+	set_draw_color(25, 25, 25, 255)
 	render_clear()
 	render_texture(next_texture, 100, 100)
 	render_texture(diamond_texture, 100, 150) 
@@ -58,7 +56,6 @@ function on_touch()
 end
 
 load_textures()
---set_window_size(2560 / 3.2, 1440 / 3.2)
 draw()
 set_window_position(10, 10)
 
