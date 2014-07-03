@@ -9,10 +9,10 @@ SDL_Window	* window	 = NULL;
 SDL_Renderer 	* renderer	 = NULL;
 char		* resource_dir 	 = NULL;
 char 		* save_dir 	 = NULL;
-int		  app_width 	 = 16 * 50;
-int		  app_height 	 =  9 * 50;
-int		  window_w;
-int		  window_h;
+int		  design_width 	 = 16 * 50;
+int		  design_height	 =  9 * 50;
+int		  window_width   = 800;
+int		  window_height  = 600;
 bool		  app_fullscreen = false;
 bool		  app_resizable  = false;
 char 		* app_title 	 = "No Title Set";
@@ -84,17 +84,31 @@ static void config() {
 	}
 	lua_settop(L, 0);
 
-	// app_width
-	lua_getglobal(L, "app_width");
+	// design_width
+	lua_getglobal(L, "design_width");
 	if (!lua_isnil(L, 1)) {
-		app_width = luaL_checkinteger(L, 1);
+		design_width = luaL_checkinteger(L, 1);
 	}
 	lua_settop(L, 0);
 
-	// app_height
-	lua_getglobal(L, "app_height");
+	// design_height
+	lua_getglobal(L, "design_height");
 	if (!lua_isnil(L, 1)) {
-		app_height = luaL_checkinteger(L, 1);
+		design_height = luaL_checkinteger(L, 1);
+	}
+	lua_settop(L, 0);
+
+	// window_width
+	lua_getglobal(L, "window_width");
+	if (!lua_isnil(L, 1)) {
+		window_width = luaL_checkinteger(L, 1);
+	}
+	lua_settop(L, 0);
+
+	// window_height
+	lua_getglobal(L, "window_height");
+	if (!lua_isnil(L, 1)) {
+		window_height = luaL_checkinteger(L, 1);
 	}
 	lua_settop(L, 0);
 
@@ -110,15 +124,15 @@ static void config() {
 	}
 
 	// app_resizable
-	if (!is_ios() && !is_android()) {
-		lua_getglobal(L, "app_resizable");
-		if (!lua_isnil(L, 1)) {
-			app_resizable = lua_toboolean(L, 1);
-		} else {
-			app_resizable = false;
-		}
-		lua_settop(L, 0);
-	}
+//	if (!is_ios() && !is_android()) {
+//		lua_getglobal(L, "app_resizable");
+//		if (!lua_isnil(L, 1)) {
+//			app_resizable = lua_toboolean(L, 1);
+//		} else {
+//			app_resizable = false;
+//		}
+//		lua_settop(L, 0);
+//	}
 
 	// save_dir
 	lua_getglobal(L, "app_save_folder");
@@ -177,8 +191,8 @@ static void init() {
 
 	config();
 
-	window_w = app_width;
-	window_h = app_height;
+//	window_w = app_width;
+//	window_h = app_height;
 
 	window_flags = SDL_WINDOW_OPENGL;
 
@@ -187,32 +201,32 @@ static void init() {
 	} else if (is_android()) {
 	} else if (is_osx()) {
 		if (app_fullscreen) window_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
-		if (app_resizable)  window_flags |= SDL_WINDOW_RESIZABLE;
+//		if (app_resizable)  window_flags |= SDL_WINDOW_RESIZABLE;
 	} else if (is_windows()) {
 		if (app_fullscreen) window_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
-		if (app_resizable)  window_flags |= SDL_WINDOW_RESIZABLE;
+//		if (app_resizable)  window_flags |= SDL_WINDOW_RESIZABLE;
 	} else if (is_linux()) {
 		if (app_fullscreen) window_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
-		if (app_resizable)  window_flags |= SDL_WINDOW_RESIZABLE;
+//		if (app_resizable)  window_flags |= SDL_WINDOW_RESIZABLE;
 	} else {
 		fatal("Platform not supported.");
 	}
 
-	if (app_resizable) {
-		window = SDL_CreateWindow("", 0, 0, window_w, window_h, SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN);
-		if (!window) fatal(SDL_GetError());
-		SDL_GetWindowSize(window, &client_area_w, &client_area_h);
-		window_w = app_width + app_width - client_area_w;
-		window_h = app_height + app_height - client_area_h;
-		SDL_DestroyWindow(window);
-	}
+//	if (app_resizable) {
+//		window = SDL_CreateWindow("", 0, 0, window_w, window_h, SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN);
+//		if (!window) fatal(SDL_GetError());
+//		SDL_GetWindowSize(window, &client_area_w, &client_area_h);
+//		window_w = app_width + app_width - client_area_w;
+//		window_h = app_height + app_height - client_area_h;
+//		SDL_DestroyWindow(window);
+//	}
 
 	window = SDL_CreateWindow(
 		app_title, 
 		SDL_WINDOWPOS_CENTERED,
 		SDL_WINDOWPOS_CENTERED,
-		window_w,
-		window_h,
+		window_width,
+		window_height,
 		window_flags);
 	if (!window) fatal(SDL_GetError());
 
@@ -221,7 +235,7 @@ static void init() {
 	renderer = SDL_CreateRenderer(window, -1, 0);
 	if (!renderer) fatal(SDL_GetError());
 
-	if (SDL_RenderSetLogicalSize(renderer, app_width, app_height)) {
+	if (SDL_RenderSetLogicalSize(renderer, design_width, design_height)) {
 		fatal(SDL_GetError());
 	}
 
