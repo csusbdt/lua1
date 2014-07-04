@@ -52,8 +52,7 @@ static void shutdown() {
 	SDL_Quit();
 }
 
-int SDLCALL eventFilter(void * userdata, SDL_Event * event)
-{
+int SDLCALL eventFilter(void * userdata, SDL_Event * event) {
 	if (event->type == SDL_APP_LOWMEMORY) {
 		lua_gc(L, LUA_GCCOLLECT, 0);
 	} else if (event->type == SDL_APP_TERMINATING) {

@@ -14,7 +14,7 @@ local name_texture
 local name_texture_w
 local name_texture_h
 
-function load_textures()
+local function load_textures()
 	diamond_texture, diamond_texture_w, diamond_texture_h 
 		= texture_from_file('textures/UI-diamond-black.png')
 	next_texture, next_texture_w, next_texture_h 
