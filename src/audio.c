@@ -249,8 +249,6 @@ static int destroy_wave(lua_State * L) {
 	if (lua_type(L, 1) != LUA_TUSERDATA) {
 		luaL_error(L, "argument to destroy_wave should be userdata");
 	}
-
-	if (!dev) return 0;
 	
 	// Extract arguments.
 	ud = (Wave **) lua_touserdata(L, 1);
@@ -263,7 +261,7 @@ static int destroy_wave(lua_State * L) {
 	}
 
 	// Do it.
-	release_wave(wave);
+	if (dev) release_wave(wave);
 	*ud = NULL; // To help with debugging.
 	return 0;
 }
