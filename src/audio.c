@@ -191,7 +191,7 @@ static int wave_from_file(lua_State * L) {
 	// Return dummy userdata if no device.
 	if (!dev) {
 		ud = (Wave **) lua_newuserdata(L, sizeof(Wave *));
-		*ud = 0;
+		*ud = 1;
 		return 1;
 	}
 
