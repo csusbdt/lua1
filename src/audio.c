@@ -188,6 +188,13 @@ static int wave_from_file(lua_State * L) {
 		luaL_error(L, "argument to wave_from_file not a string");
 	}
 
+	// Return dummy userdata if no device.
+	if (!dev) {
+		ud = (Wave **) lua_newuserdata(L, sizeof(Wave *));
+		*ud = 0;
+		return 1;
+	}
+
 	// Extract argument.
 	filename = luaL_checkstring(L, 1);
 
@@ -242,6 +249,8 @@ static int destroy_wave(lua_State * L) {
 	if (lua_type(L, 1) != LUA_TUSERDATA) {
 		luaL_error(L, "argument to destroy_wave should be userdata");
 	}
+
+	if (!dev) return 0;
 	
 	// Extract arguments.
 	ud = (Wave **) lua_touserdata(L, 1);
@@ -270,6 +279,8 @@ static int play_wave(lua_State * L) {
 	if (lua_type(L, 1) != LUA_TUSERDATA) {
 		luaL_error(L, "argument to play_wave should be userdata");
 	}
+
+	if (!dev) return 0;
 	
 	// Extract arguments.
 	ud = (Wave **) lua_touserdata(L, 1);
@@ -299,6 +310,12 @@ static int loop_wave(lua_State * L) {
 	}
 	if (lua_type(L, 1) != LUA_TUSERDATA) {
 		luaL_error(L, "argument to loop_wave should be userdata");
+	}
+
+	// Return dummy data when no device.
+	if (!dev) {
+		lua_pushinteger(L, 0);
+		return 1;
 	}
 	
 	// Extract arguments.
@@ -330,6 +347,8 @@ static int stop_loop(lua_State * L) {
 	if (lua_type(L, 1) != LUA_TNUMBER) {
 		luaL_error(L, "argument to stop_loop should be an integer");
 	}
+
+	if (!dev) return 0;
 	
 	// Extract arguments.
 	i = luaL_checknumber(L, 1);
@@ -365,7 +384,7 @@ static void sdl_audio_callback(void * userdata, Uint8 * stream, int len) {
 }
 
 void shutdown_audio() {
-	SDL_CloseAudioDevice(dev);
+	if (dev) SDL_CloseAudioDevice(dev);
 }
 
 void register_audio_functions(lua_State * L) {
@@ -384,7 +403,11 @@ void register_audio_functions(lua_State * L) {
 	want.callback  = sdl_audio_callback;
 
 	dev = SDL_OpenAudioDevice(NULL, 0, &want, &app_audio_spec, 0);
-	if (dev == 0) fatal(SDL_GetError());
+	//if (dev == 0) fatal(SDL_GetError());
+	if (dev == 0) {
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, app_title, "Audio not available.", NULL);
+		return;
+	}
 
 	SDL_PauseAudioDevice(dev, 0); 
 

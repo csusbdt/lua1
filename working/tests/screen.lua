@@ -24,10 +24,12 @@ local function load_textures()
 end
 
 local function draw()
-	set_draw_color(25, 25, 25, 255)
+	set_draw_color(125, 125, 125, 255)
 	render_clear()
 	render_texture(next_texture, 100, 100)
-	render_texture(diamond_texture, 100, 150) 
+	render_texture(diamond_texture, 400 - diamond_texture_w/2, 300 - diamond_texture_h/2) 
+	render_texture(diamond_texture, 800 - diamond_texture_w, 600 - diamond_texture_h) 
+	render_texture(diamond_texture, 1024 - diamond_texture_w, 768 - diamond_texture_h) 
 	render_texture(name_texture, 100, 200) 
 	render()
 end

@@ -1,5 +1,5 @@
-design_width = 800
-design_height = 600
+design_width = 1024
+design_height = 768
 
 window_width = 800
 window_height = 600
