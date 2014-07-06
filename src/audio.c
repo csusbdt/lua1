@@ -191,7 +191,7 @@ static int wave_from_file(lua_State * L) {
 	// Return dummy userdata if no device.
 	if (!dev) {
 		ud = (Wave **) lua_newuserdata(L, sizeof(Wave *));
-		*ud = 1;
+		*ud = 0;
 		return 1;
 	}
 
@@ -241,6 +241,8 @@ static int wave_from_file(lua_State * L) {
 static int destroy_wave(lua_State * L) {
 	Wave ** ud;
 	Wave * wave;
+
+	if (!dev) return 0;
 	
 	// Check arguments.
 	if (lua_gettop(L) != 1) {
@@ -261,7 +263,7 @@ static int destroy_wave(lua_State * L) {
 	}
 
 	// Do it.
-	if (dev) release_wave(wave);
+	release_wave(wave);
 	*ud = NULL; // To help with debugging.
 	return 0;
 }
@@ -269,6 +271,8 @@ static int destroy_wave(lua_State * L) {
 static int play_wave(lua_State * L) {
 	Wave ** ud;
 	Wave * wave;
+
+	if (!dev) return 0;
 	
 	// Check arguments.
 	if (lua_gettop(L) != 1) {
@@ -283,8 +287,6 @@ static int play_wave(lua_State * L) {
 	if (ud == NULL) {
 		luaL_error(L, "userdata unexpectedly null in play_wave");
 	}
-
-	if (!dev) return 0;
 
 	wave = *ud;
 	if (wave == NULL) {
@@ -302,6 +304,8 @@ static int loop_wave(lua_State * L) {
 	Wave ** ud;
 	Wave * wave;
 	int i;
+
+	if (!dev) return 0;
 	
 	// Check arguments.
 	if (lua_gettop(L) != 1) {
@@ -309,12 +313,6 @@ static int loop_wave(lua_State * L) {
 	}
 	if (lua_type(L, 1) != LUA_TUSERDATA) {
 		luaL_error(L, "argument to loop_wave should be userdata");
-	}
-
-	// Return dummy data when no device.
-	if (!dev) {
-		lua_pushinteger(L, 0);
-		return 1;
 	}
 	
 	// Extract arguments.
@@ -338,6 +336,8 @@ static int loop_wave(lua_State * L) {
 
 static int stop_loop(lua_State * L) {
 	int i;
+
+	if (!dev) return 0;
 	
 	// Check arguments.
 	if (lua_gettop(L) != 1) {
@@ -346,8 +346,6 @@ static int stop_loop(lua_State * L) {
 	if (lua_type(L, 1) != LUA_TNUMBER) {
 		luaL_error(L, "argument to stop_loop should be an integer");
 	}
-
-	if (!dev) return 0;
 	
 	// Extract arguments.
 	i = luaL_checknumber(L, 1);
