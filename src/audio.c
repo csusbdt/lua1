@@ -407,9 +407,9 @@ void register_audio_functions(lua_State * L) {
 	if (dev == 0) {
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, app_title, "Audio not available.", NULL);
 		return;
+	} else {
+		SDL_PauseAudioDevice(dev, 0); 
 	}
-
-	SDL_PauseAudioDevice(dev, 0); 
 
 	// Now register Lua functions.
 
