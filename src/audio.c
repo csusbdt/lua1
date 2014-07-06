@@ -277,14 +277,15 @@ static int play_wave(lua_State * L) {
 	if (lua_type(L, 1) != LUA_TUSERDATA) {
 		luaL_error(L, "argument to play_wave should be userdata");
 	}
-
-	if (!dev) return 0;
 	
 	// Extract arguments.
 	ud = (Wave **) lua_touserdata(L, 1);
 	if (ud == NULL) {
 		luaL_error(L, "userdata unexpectedly null in play_wave");
 	}
+
+	if (!dev) return 0;
+
 	wave = *ud;
 	if (wave == NULL) {
 		luaL_error(L, "play_wave called with null wave");
