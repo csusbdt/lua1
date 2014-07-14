@@ -6,7 +6,7 @@ static int fullscreen(lua_State * L) {
 	if (is_ios() || is_android()) return 0;
 	if (app_fullscreen) return 0;
 	app_fullscreen = true;
-	if (SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP)) {
+	if (SDL_SetWindowFullscreen(window, SDL_GetWindowFlags(window) | SDL_WINDOW_FULLSCREEN_DESKTOP)) {
 		luaL_error(L, "%s", SDL_GetError());
 	}
 	return 0;
@@ -16,7 +16,7 @@ int windowed(lua_State * L) {
 	if (is_ios() || is_android()) return 0;
 	if (!app_fullscreen) return 0;
 	app_fullscreen = false;
-	if (SDL_SetWindowFullscreen(window, 0)) {
+	if (SDL_SetWindowFullscreen(window, SDL_GetWindowFlags(window) ^ SDL_WINDOW_FULLSCREEN_DESKTOP)) {
 		luaL_error(L, "%s", SDL_GetError());
 	}
 	return 0;

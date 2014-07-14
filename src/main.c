@@ -16,6 +16,7 @@ int		  window_height  = 600;
 bool		  app_fullscreen = false;
 bool		  app_resizable  = false;
 char 		* app_title 	 = "No Title Set";
+SDL_DisplayMode   display_mode;
 
 static int 	  	  app_millis_per_update = 1000 / 60;
 static lua_State	* L;
@@ -168,8 +169,10 @@ static void init() {
 	char * base_path;
 	int img_support;
 	int window_flags;
-	int client_area_w;
-	int client_area_h;
+//	int window_w;
+//	int window_h;
+//	int client_area_w;
+//	int client_area_h;
 
 	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
 		fatal(SDL_GetError());
@@ -192,8 +195,9 @@ static void init() {
 
 	config();
 
-//	window_w = app_width;
-//	window_h = app_height;
+        if (SDL_GetDisplayMode(0, 0, &display_mode) != 0) {
+		fatal(SDL_GetError());
+	}
 
 	window_flags = SDL_WINDOW_OPENGL;
 

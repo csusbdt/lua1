@@ -2,6 +2,7 @@
 
 extern int design_width;
 extern int design_height;
+extern SDL_DisplayMode display_mode;
 
 static void on_window_closing(lua_State * L) {
 	lua_getglobal(L, "on_window_closing");
@@ -39,8 +40,13 @@ static void on_mouse_down(lua_State * L, const SDL_MouseButtonEvent * e) {
 		SDL_GetWindowSize(window, &window_w, &window_h);
 		SDL_GL_GetDrawableSize(window, &drawable_w, &drawable_h);
 
-		lua_pushinteger(L, e->x * drawable_w / (float) window_w);
-		lua_pushinteger(L, e->y * drawable_h / (float) window_h);
+		if (app_fullscreen) {
+			lua_pushinteger(L, e->x * drawable_w / (float) window_w * display_mode.w / (float) design_width);
+			lua_pushinteger(L, e->y * drawable_h / (float) window_h * display_mode.h / (float) design_height);
+		} else {
+			lua_pushinteger(L, e->x * drawable_w / (float) window_w);
+			lua_pushinteger(L, e->y * drawable_h / (float) window_h);
+		}
 		if (lua_pcall(L, 2, 0, 0)) fatal(lua_tostring(L, -1));
 	}
 }
