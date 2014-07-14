@@ -12,6 +12,7 @@ osx :
 	if [ ! -d build ]; then mkdir -p build; fi
 	if [ -e build/a.out ]; then rm build/a.out; fi
 	clang 	-o build/a.out               \
+		 -mmacosx-version-min=10.5   \
 		-D _THREAD_SAFE              \
 		-D SDL_ASSERT_LEVEL=2        \
 		-I include                   \
