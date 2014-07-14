@@ -1,13 +1,12 @@
-design_width = 1024
-design_height = 768
+--design_width = 1024
+--design_height = 768
+--window_width = 800
+--window_height = 600
 
+design_width = 2560
+design_height = 1440 
 window_width = 800
-window_height = 600
-
---app_height = 450
---app_width = 800
---app_width = 2560
---app_height = 1440
+window_height = 450
 
 app_fullscreen = false
 --app_resizable = true

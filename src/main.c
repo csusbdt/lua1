@@ -241,8 +241,6 @@ static void init() {
 		fatal(SDL_GetError());
 	}
 
-	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
-
 	//SDL_AddEventWatch(eventFilter, NULL);
 
 	if (TTF_Init()) fatal(TTF_GetError());
