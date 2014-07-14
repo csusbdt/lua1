@@ -27,6 +27,10 @@ static void on_mouse_down(lua_State * L, const SDL_MouseButtonEvent * e) {
 	int window_h;
 	int drawable_w;
 	int drawable_h;
+	float scale_x;
+	float scale_y;
+	float offset_x;
+	float offset_y;
 
 	if (e->type == SDL_MOUSEBUTTONDOWN && e->button == SDL_BUTTON_LEFT) {
 		SDL_assert(lua_gettop(L) == 0);
@@ -41,8 +45,12 @@ static void on_mouse_down(lua_State * L, const SDL_MouseButtonEvent * e) {
 		SDL_GL_GetDrawableSize(window, &drawable_w, &drawable_h);
 
 		if (app_fullscreen) {
-			lua_pushinteger(L, e->x * drawable_w / (float) window_w * display_mode.w / (float) design_width);
-			lua_pushinteger(L, e->y * drawable_h / (float) window_h * display_mode.h / (float) design_height);
+			scale_x = drawable_w / (float) window_w * display_mode.w / (float) design_width;
+			scale_y = drawable_h / (float) window_h * display_mode.h / (float) design_height;
+			offset_x = (display_mode.w - design_width) / 2.0;
+			offset_y = (display_mode.h - design_height) / 2.0;
+			lua_pushinteger(L, e->x * scale_x + offset_x);
+			lua_pushinteger(L, e->y * scale_y + offset_y);
 		} else {
 			lua_pushinteger(L, e->x * drawable_w / (float) window_w);
 			lua_pushinteger(L, e->y * drawable_h / (float) window_h);
