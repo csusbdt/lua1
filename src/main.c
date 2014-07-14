@@ -52,6 +52,7 @@ static void shutdown() {
 	SDL_Quit();
 }
 
+/*
 int SDLCALL eventFilter(void * userdata, SDL_Event * event) {
 	if (event->type == SDL_APP_LOWMEMORY) {
 		lua_gc(L, LUA_GCCOLLECT, 0);
@@ -68,6 +69,7 @@ int SDLCALL eventFilter(void * userdata, SDL_Event * event) {
 	}
         return 0; // Return 0 to indicate event has been handled.
 }
+*/
 
 // Get initialization setting from config.lua.
 static void config() {
@@ -198,7 +200,8 @@ static void init() {
 	if (is_ios()) {
 		window_flags |= SDL_WINDOW_RESIZABLE; // required to change orientation
 	} else if (is_android()) {
-	} else if (is_osx()) {
+	} else if (is_osx()) { 
+		window_flags |= SDL_WINDOW_ALLOW_HIGHDPI;
 		if (app_fullscreen) window_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 //		if (app_resizable)  window_flags |= SDL_WINDOW_RESIZABLE;
 	} else if (is_windows()) {
@@ -240,7 +243,7 @@ static void init() {
 
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
 
-	SDL_AddEventWatch(eventFilter, NULL);
+	//SDL_AddEventWatch(eventFilter, NULL);
 
 	if (TTF_Init()) fatal(TTF_GetError());
 

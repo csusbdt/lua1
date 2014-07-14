@@ -75,10 +75,12 @@ bool process_event_queue(lua_State * L) {
 	SDL_Event e;
 
 	while (SDL_PollEvent(&e)) {
-		if      (e.type == SDL_QUIT)          { on_window_closing(L);  return false; } 
-		else if (e.type == SDL_MOUSEBUTTONDOWN) on_mouse_down(L, &e.button);
-		else if (e.type == SDL_KEYDOWN)         on_key_down(L, &e.key);
-		else if (e.type == SDL_WINDOWEVENT)     on_window_event(L, e.window.event);
+		if      (e.type == SDL_QUIT)               { on_window_closing(L);  return false; } 
+		else if (e.type == SDL_MOUSEBUTTONDOWN)      on_mouse_down(L, &e.button);
+		else if (e.type == SDL_KEYDOWN)              on_key_down(L, &e.key);
+		else if (e.type == SDL_WINDOWEVENT)          on_window_event(L, e.window.event);
+		else if (e.type == SDL_RENDER_DEVICE_RESET)  on_render_device_reset(L);
+		else if (e.type == SDL_RENDER_TARGETS_RESET) on_render_targets_reset(L);
 	}
 	lua_settop(L, 0);
 	return true;
