@@ -1,5 +1,5 @@
 local name_text = "CECILIA"
-local name_font = open_font('fonts/CaviarDreams.ttf', 36)
+local name_font = open_font('fonts/CaviarDreams.ttf', 80)
 
 local main_texture
 local main_texture_w
@@ -36,7 +36,7 @@ local function draw()
 	render_texture(diamond_texture, 400 - diamond_texture_w/2, 300 - diamond_texture_h/2) 
 	render_texture(diamond_texture, 800 - diamond_texture_w, 600 - diamond_texture_h) 
 	render_texture(diamond_texture, 1024 - diamond_texture_w, 768 - diamond_texture_h) 
-	render_texture(name_texture, 385 - name_texture_w / 2, 353 - name_texture_h / 2) 
+	render_texture(name_texture, 960 - name_texture_w / 2, 414 - name_texture_h / 2) 
 	render()
 end
 
@@ -65,5 +65,5 @@ end
 
 load_textures()
 draw()
-set_window_position(10, 10)
+set_window_position(100, 100)
 

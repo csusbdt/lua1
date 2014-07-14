@@ -5,8 +5,8 @@
 
 design_width = 2560
 design_height = 1440 
-window_width = 800
-window_height = 450
+window_width = 1024
+window_height = 576
 
 app_fullscreen = false
 --app_resizable = true
