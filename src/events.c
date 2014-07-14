@@ -1,5 +1,8 @@
 #include "global.h"
 
+extern int design_width;
+extern int design_height;
+
 static void on_window_closing(lua_State * L) {
 	lua_getglobal(L, "on_window_closing");
 	if (lua_isnil(L, 1)) return;
@@ -19,6 +22,11 @@ void on_render_targets_reset(lua_State * L) { // Called from main.
 }
 
 static void on_mouse_down(lua_State * L, const SDL_MouseButtonEvent * e) {
+	int window_w;
+	int window_h;
+	int drawable_w;
+	int drawable_h;
+
 	if (e->type == SDL_MOUSEBUTTONDOWN && e->button == SDL_BUTTON_LEFT) {
 		SDL_assert(lua_gettop(L) == 0);
 		lua_getglobal(L, "on_touch");
@@ -27,8 +35,12 @@ static void on_mouse_down(lua_State * L, const SDL_MouseButtonEvent * e) {
 			lua_settop(L, 0);
 			return;
 		}
-		lua_pushinteger(L, e->x);
-		lua_pushinteger(L, e->y);
+
+		SDL_GetWindowSize(window, &window_w, &window_h);
+		SDL_GL_GetDrawableSize(window, &drawable_w, &drawable_h);
+
+		lua_pushinteger(L, e->x * drawable_w / (float) window_w);
+		lua_pushinteger(L, e->y * drawable_h / (float) window_h);
 		if (lua_pcall(L, 2, 0, 0)) fatal(lua_tostring(L, -1));
 	}
 }
