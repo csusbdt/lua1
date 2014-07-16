@@ -47,18 +47,21 @@ static void on_mouse_down(lua_State * L, const SDL_MouseButtonEvent * e) {
 			return;
 		}
 
+		SDL_GetWindowSize(window, &window_w, &window_h);
+		SDL_GL_GetDrawableSize(window, &drawable_w, &drawable_h);
+
 		x = 2 * e->x;
 		y = 2 * e->y;
 
 		if (app_fullscreen) {
-//        		if (SDL_GetDisplayMode(0, 0, &mode) != 0) {
-//				fatal(SDL_GetError());
-//			}
-			x = x + (display_mode.w * 2 - design_width) / 2.0;
-			y = y + (display_mode.h * 2 - design_height) / 2.0;
+			if (drawable_w > window_w) {
+				x = x + (display_mode.w * 2 - design_width) / 2.0;
+				y = y + (display_mode.h * 2 - design_height) / 2.0;
+			} else {
+				x = e->x;
+				y = e->y;
+			}
 		} else {
-			SDL_GetWindowSize(window, &window_w, &window_h);
-			SDL_GL_GetDrawableSize(window, &drawable_w, &drawable_h);
 			//x = x * drawable_w / (float) window_w;
 			//y = y * drawable_h / (float) window_h;
 			x = e->x * drawable_w / (float) window_w;
