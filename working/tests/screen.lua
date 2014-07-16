@@ -20,7 +20,11 @@ local name_texture_h
 local next_x 
 local next_y 
 
+local x = 0
+local y = 0
+
 local function load_textures()
+--[[
 	main_texture, main_texture_w, main_texture_h 
 		= texture_from_file('textures/UI-main.png')
 	diamond_texture, diamond_texture_w, diamond_texture_h 
@@ -31,17 +35,27 @@ local function load_textures()
 	next_y = 312 + 132
 	name_texture, name_texture_w, name_texture_h 
 		= texture_from_font(name_font, name_text, 255, 255, 255, 255)
+--]]
 end
 
 local function draw()
 	set_draw_color(125, 125, 125, 255)
 	render_clear()
+--[[
 	render_texture(main_texture, 0, 312)
 	render_texture(next_texture, design_width - next_texture_w * 2, 312 + 132)
 	render_texture(diamond_texture, 400 - diamond_texture_w/2, 300 - diamond_texture_h/2) 
 	render_texture(diamond_texture, 800 - diamond_texture_w, 600 - diamond_texture_h) 
 	render_texture(diamond_texture, 1024 - diamond_texture_w, 768 - diamond_texture_h) 
 	render_texture(name_texture, 960 - name_texture_w / 2, 414 - name_texture_h / 2) 
+--]]
+	set_draw_color(125, 0, 0, 0)
+        fill_rect(0, 0, 20, 20)
+        fill_rect((design_width - 20) / 2.0, (design_height - 20) / 2.0, 20, 20)
+        fill_rect(design_width - 20, design_height - 20, 20, 20)
+
+	render_texture(texture_from_font(name_font, '' .. x .. ' ' .. y, 255, 255, 255, 255))
+
 	render()
 end
 
@@ -57,7 +71,8 @@ end
 function on_update()
 end
 
-function on_touch(x, y)
+function on_touch(mx, my)
+--[[
 	if x >= next_x and 
 	   x <= next_x + next_texture_w and 
 	   y >= next_y and 
@@ -66,6 +81,21 @@ function on_touch(x, y)
 		dofile('tests/screen1.lua')
 		return
 	end
+	if not app_fullscreen then 
+		fullscreen()
+		app_fullscreen = true
+	else
+		windowed()
+		app_fullscreen = false
+	end
+--]]
+-- msgbox("x, y = " .. mx .. "  " .. my)
+	x = mx
+	y = my
+	draw()
+end
+
+function on_keydown()
 	if not app_fullscreen then 
 		fullscreen()
 		app_fullscreen = true

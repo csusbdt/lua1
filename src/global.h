@@ -22,6 +22,7 @@ extern int app_width;
 extern int app_height;
 extern bool app_fullscreen;
 extern char * app_title;
+extern SDL_DisplayMode   display_mode;
 
 extern const SDL_Color APP_WHITE;
 

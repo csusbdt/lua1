@@ -195,10 +195,6 @@ static void init() {
 
 	config();
 
-        if (SDL_GetDisplayMode(0, 0, &display_mode) != 0) {
-		fatal(SDL_GetError());
-	}
-
 	window_flags = SDL_WINDOW_OPENGL;
 
 	if (is_ios()) {
@@ -240,6 +236,16 @@ static void init() {
 
 	renderer = SDL_CreateRenderer(window, -1, 0);
 	if (!renderer) fatal(SDL_GetError());
+
+        if (SDL_GetDisplayMode(0, 0, &display_mode) != 0) {
+		fatal(SDL_GetError());
+	}
+	printf("display_mode = %d %d \n", display_mode.w, display_mode.h);
+
+        if (SDL_GetDesktopDisplayMode(0, &display_mode) != 0) {
+	printf("desktop_display_mode = %d %d \n", display_mode.w, display_mode.h);
+		fatal(SDL_GetError());
+	}
 
 	if (SDL_RenderSetLogicalSize(renderer, design_width, design_height)) {
 		fatal(SDL_GetError());

@@ -9,6 +9,10 @@ static int fullscreen(lua_State * L) {
 	if (SDL_SetWindowFullscreen(window, SDL_GetWindowFlags(window) | SDL_WINDOW_FULLSCREEN_DESKTOP)) {
 		luaL_error(L, "%s", SDL_GetError());
 	}
+        if (SDL_GetDesktopDisplayMode(0, &display_mode) != 0) {
+		fatal(SDL_GetError());
+	}
+	printf("desktop_display_mode = %d, %d \n", display_mode.w, display_mode.h);
 	return 0;
 }
 
@@ -19,6 +23,10 @@ int windowed(lua_State * L) {
 	if (SDL_SetWindowFullscreen(window, SDL_GetWindowFlags(window) ^ SDL_WINDOW_FULLSCREEN_DESKTOP)) {
 		luaL_error(L, "%s", SDL_GetError());
 	}
+        if (SDL_GetDesktopDisplayMode(0, &display_mode) != 0) {
+		fatal(SDL_GetError());
+	}
+	printf("desktop_display_mode = %d, %d \n", display_mode.w, display_mode.h);
 	return 0;
 }
 
