@@ -169,10 +169,6 @@ static void init() {
 	char * base_path;
 	int img_support;
 	int window_flags;
-//	int window_w;
-//	int window_h;
-//	int client_area_w;
-//	int client_area_h;
 
 	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
 		fatal(SDL_GetError());
@@ -203,25 +199,13 @@ static void init() {
 	} else if (is_osx()) { 
 		window_flags |= SDL_WINDOW_ALLOW_HIGHDPI;
 		if (app_fullscreen) window_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
-//		if (app_resizable)  window_flags |= SDL_WINDOW_RESIZABLE;
 	} else if (is_windows()) {
 		if (app_fullscreen) window_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
-//		if (app_resizable)  window_flags |= SDL_WINDOW_RESIZABLE;
 	} else if (is_linux()) {
 		if (app_fullscreen) window_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
-//		if (app_resizable)  window_flags |= SDL_WINDOW_RESIZABLE;
 	} else {
 		fatal("Platform not supported.");
 	}
-
-//	if (app_resizable) {
-//		window = SDL_CreateWindow("", 0, 0, window_w, window_h, SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN);
-//		if (!window) fatal(SDL_GetError());
-//		SDL_GetWindowSize(window, &client_area_w, &client_area_h);
-//		window_w = app_width + app_width - client_area_w;
-//		window_h = app_height + app_height - client_area_h;
-//		SDL_DestroyWindow(window);
-//	}
 
 	window = SDL_CreateWindow(
 		app_title, 

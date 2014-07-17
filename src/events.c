@@ -27,15 +27,8 @@ static void on_mouse_down(lua_State * L, const SDL_MouseButtonEvent * e) {
 	int window_h;
 	int drawable_w;
 	int drawable_h;
-	float scale_x;
-	float scale_y;
-	float offset_x;
-	float offset_y;
-	float aspect;
-	float retina_factor;
 	float x;
 	float y;
-	float gap;
 	SDL_DisplayMode mode;
 
 	if (e->type == SDL_MOUSEBUTTONDOWN && e->button == SDL_BUTTON_LEFT) {
@@ -62,64 +55,10 @@ static void on_mouse_down(lua_State * L, const SDL_MouseButtonEvent * e) {
 				y = e->y;
 			}
 		} else {
-			//x = x * drawable_w / (float) window_w;
-			//y = y * drawable_h / (float) window_h;
 			x = e->x * drawable_w / (float) window_w;
 			y = e->y * drawable_h / (float) window_h;
 		}
 
-/*
-		SDL_GetWindowSize(window, &window_w, &window_h);
-		SDL_GL_GetDrawableSize(window, &drawable_w, &drawable_h);
-
-		if (drawable_w > window_w) {
-			retina_factor = 2.0;
-		} else {
-			retina_factor = 1.0;
-		}
-			
-printf("mouse = %d %d \n", e->x, e->y);	
-printf("window_w/h = %d %d \n", window_w, window_h);
-printf("drawable_w/h = %d %d \n", drawable_w, drawable_h);
-
-		if (app_fullscreen) {
-			if (display_mode.w * design_height > design_width * display_mode.h) {
-				// top and bottom letterboxing
-				gap = window_h - design_height / retina_factor;
-				y = (e->y + gap) * retina_factor;
-				x = e->x * drawable_w / (float) window_w;
-			} else {
-				// left and right letterboxing
-				gap = window_w - design_width / retina_factor;
-				x = (e->x + gap) * retina_factor;
-				y = e->y * drawable_h / (float) window_h;
-			}
-		} else {
-			x = e->x * drawable_w / (float) window_w;
-			y = e->y * drawable_h / (float) window_h;
-		}
-
-			aspect = display_mode.w / display_mode.h;
-			if (display_mode.w * design_height > design_width * display_mode.h) {
-				// top and bottom letterboxing
-	//			scale_y = window_height / display_mode.h;
-	//			offset_y = 
-			}
-				
-
-		//	scale_x = drawable_w / (float) window_w * display_mode.w / (float) design_width;
-		//	scale_y = drawable_h / (float) window_h * display_mode.h / (float) design_height;
-		//	offset_x = (display_mode.w - design_width) / 2.0;
-		//	offset_y = (display_mode.h - design_height) / 2.0;
-		//	lua_pushinteger(L, e->x * scale_x + offset_x);
-		//	lua_pushinteger(L, e->y * scale_y + offset_y);
-			lua_pushinteger(L, e->x * drawable_w / (float) window_w);
-			lua_pushinteger(L, e->y * drawable_h / (float) window_h);
-		} else {
-			lua_pushinteger(L, e->x * drawable_w / (float) window_w);
-			lua_pushinteger(L, e->y * drawable_h / (float) window_h);
-		}
-*/
 		lua_pushinteger(L, x);
 		lua_pushinteger(L, y);
 		if (lua_pcall(L, 2, 0, 0)) fatal(lua_tostring(L, -1));
