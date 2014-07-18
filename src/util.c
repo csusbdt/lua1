@@ -12,7 +12,6 @@ static int fullscreen(lua_State * L) {
         if (SDL_GetDesktopDisplayMode(0, &display_mode) != 0) {
 		fatal(SDL_GetError());
 	}
-	printf("desktop_display_mode = %d, %d \n", display_mode.w, display_mode.h);
 	return 0;
 }
 

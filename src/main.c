@@ -53,24 +53,33 @@ static void shutdown() {
 	SDL_Quit();
 }
 
-/*
+// TODO: I'm not sure if device reset is being handled correctly.
+// Note: the event filter may run in a separate thread; this is the
+// reason (I believe) that I could not handle SDL_RENDER_TARGETS_RESET event
+// in the event filter on Windows when going to fullscreen mode.
 int SDLCALL eventFilter(void * userdata, SDL_Event * event) {
-	if (event->type == SDL_APP_LOWMEMORY) {
-		lua_gc(L, LUA_GCCOLLECT, 0);
-	} else if (event->type == SDL_APP_TERMINATING) {
+        // Return 0 to indicate event has been handled.
+        // Return 1 to have event added to SDL event queue.
+	if (event->type == SDL_APP_TERMINATING) {
 		running = false;
+		return 0;
 	} else if (event->type == SDL_RENDER_DEVICE_RESET) {
 		on_render_device_reset(L);
+		return 0;
 	} else if (event->type == SDL_RENDER_TARGETS_RESET) {
-		on_render_targets_reset(L);
-	} else {
-		// This is not a special case event to handle, 
-		// so return 1 to let it go onto the event queue.
 		return 1;
+	} else if (event->type == SDL_MOUSEBUTTONDOWN) {
+		return 1;
+	} else if (event->type == SDL_QUIT) {
+		return 1;
+	} else if (event->type == SDL_KEYDOWN) {
+		return 1;
+	} else if (event->type == SDL_WINDOWEVENT) {
+		return 1;
+	} else {
+		return 0;
 	}
-        return 0; // Return 0 to indicate event has been handled.
 }
-*/
 
 // Get initialization setting from config.lua.
 static void config() {
@@ -238,10 +247,8 @@ static void init() {
         if (SDL_GetDisplayMode(0, 0, &display_mode) != 0) {
 		fatal(SDL_GetError());
 	}
-	printf("display_mode = %d %d \n", display_mode.w, display_mode.h);
 
         if (SDL_GetDesktopDisplayMode(0, &display_mode) != 0) {
-	printf("desktop_display_mode = %d %d \n", display_mode.w, display_mode.h);
 		fatal(SDL_GetError());
 	}
 
@@ -249,7 +256,7 @@ static void init() {
 		fatal(SDL_GetError());
 	}
 
-	//SDL_AddEventWatch(eventFilter, NULL);
+	SDL_AddEventWatch(eventFilter, NULL);
 
 	if (TTF_Init()) fatal(TTF_GetError());
 
