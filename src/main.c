@@ -191,6 +191,20 @@ static void init() {
 
 	config();
 
+	// Place useful information into Lua global namespace.
+
+	lua_pushstring(L, resource_dir);
+	lua_setglobal(L, "resource_dir");
+	lua_pushstring(L, save_dir);
+	lua_setglobal(L, "save_dir");
+	if (is_windows()) {
+		lua_pushstring(L, "\\");
+	} else {
+		lua_pushstring(L, "/");
+	}
+	lua_setglobal(L, "path_separator");
+	SDL_assert(lua_gettop(L) == 0);
+
 	window_flags = SDL_WINDOW_OPENGL;
 
 	if (is_ios()) {
