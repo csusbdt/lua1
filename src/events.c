@@ -56,6 +56,19 @@ printf("requested window size = %d %d \n", window_width, window_height);
 	if (drawable_w > window_w) { // retina display
 		x = 2 * e->x;
 		y = 2 * e->y;
+		if (app_fullscreen) {
+			design_ratio = design_width / (float) design_height;
+			window_ratio = window_w / (float) window_h;
+			if (window_ratio < design_ratio) {
+				// Letterboxing top and bottom.
+				gap = design_width / window_ratio - design_height;
+				y = y + gap / 2.0;
+			} else {
+				// Letterboxing left and right.
+				gap = window_ratio * design_height - design_width;
+				x = x + gap / 2.0;
+			}
+		}
 	} else {
 		x = e->x;
 		y = e->y;
@@ -64,20 +77,6 @@ printf("requested window size = %d %d \n", window_width, window_height);
 		// Transform from window coordinates to design coordinates.
 //		x = design_width / (float) window_w * e->x;
 //		y = design_height / (float) window_h * e->y;
-
-	if (app_fullscreen) {
-		design_ratio = design_width / (float) design_height;
-		window_ratio = window_w / (float) window_h;
-		if (window_ratio < design_ratio) {
-			// Letterboxing top and bottom.
-			gap = design_width / window_ratio - design_height;
-			y = y + gap / 2.0;
-		} else {
-			// Letterboxing left and right.
-			gap = window_ratio * design_height - design_width;
-			x = x + gap / 2.0;
-		}
-	}
 
 /*
 			if (drawable_w > window_w) { // retina display
