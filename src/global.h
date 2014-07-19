@@ -18,8 +18,8 @@ typedef int bool;
 
 extern SDL_Window   * window;
 extern SDL_Renderer * renderer;
-extern int app_width;
-extern int app_height;
+extern int window_width;
+extern int window_height;
 extern bool app_fullscreen;
 extern char * app_title;
 extern SDL_DisplayMode   display_mode;

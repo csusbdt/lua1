@@ -30,6 +30,9 @@ static void on_mouse_down(lua_State * L, const SDL_MouseButtonEvent * e) {
 	float x;
 	float y;
 	SDL_DisplayMode mode;
+	float window_ratio;
+	float design_ratio;
+	float gap;
 
 	if (e->type == SDL_MOUSEBUTTONDOWN && e->button == SDL_BUTTON_LEFT) {
 		SDL_assert(lua_gettop(L) == 0);
@@ -40,14 +43,44 @@ static void on_mouse_down(lua_State * L, const SDL_MouseButtonEvent * e) {
 			return;
 		}
 
+printf("------------------------------ \n");
+printf("mouse = %d, %d \n", e->x, e->y);
+printf("display_mode = %d, %d \n", display_mode.w, display_mode.h);
 		SDL_GetWindowSize(window, &window_w, &window_h);
+printf("window_w = %d %d \n", window_w, window_h);
 		SDL_GL_GetDrawableSize(window, &drawable_w, &drawable_h);
+printf("drawable_w = %d %d \n", drawable_w, drawable_h);
+printf("design = %d %d \n", design_width, design_height);
+printf("requested window size = %d %d \n", window_width, window_height);
 
+	if (drawable_w > window_w) { // retina display
 		x = 2 * e->x;
 		y = 2 * e->y;
+	} else {
+		x = e->x;
+		y = e->y;
+	}
 
-		if (app_fullscreen) {
-			if (drawable_w > window_w) {
+		// Transform from window coordinates to design coordinates.
+//		x = design_width / (float) window_w * e->x;
+//		y = design_height / (float) window_h * e->y;
+
+	if (app_fullscreen) {
+		design_ratio = design_width / (float) design_height;
+		window_ratio = window_w / (float) window_h;
+		if (window_ratio < design_ratio) {
+			// Letterboxing top and bottom.
+			gap = design_width / window_ratio - design_height;
+			y = y + gap / 2.0;
+		} else {
+			// Letterboxing left and right.
+			gap = window_ratio * design_height - design_width;
+			x = x + gap / 2.0;
+		}
+	}
+
+/*
+			if (drawable_w > window_w) { // retina display
 				x = x + (display_mode.w * 2 - design_width) / 2.0;
 				y = y + (display_mode.h * 2 - design_height) / 2.0;
 			} else {
@@ -55,9 +88,15 @@ static void on_mouse_down(lua_State * L, const SDL_MouseButtonEvent * e) {
 				y = e->y;
 			}
 		} else {
-			x = e->x * drawable_w / (float) window_w;
-			y = e->y * drawable_h / (float) window_h;
+			if (drawable_w > window_w) { // retina display
+				x = 2 * e->x;
+				y = 2 * e->y;
+			} else {
+//				x = e->x;
+//				y = e->y;
+			}
 		}
+*/
 
 		lua_pushinteger(L, x);
 		lua_pushinteger(L, y);
