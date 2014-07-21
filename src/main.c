@@ -5,6 +5,7 @@ void on_render_device_reset(lua_State * L);
 void on_render_targets_reset(lua_State * L);
 
 bool		  running 	 = true;
+bool		  drawing 	 = true;
 SDL_Window	* window	 = NULL;
 SDL_Renderer 	* renderer	 = NULL;
 char		* resource_dir 	 = NULL;
@@ -62,6 +63,12 @@ int SDLCALL eventFilter(void * userdata, SDL_Event * event) {
         // Return 1 to have event added to SDL event queue.
 	if (event->type == SDL_APP_TERMINATING) {
 		running = false;
+		return 0;
+	} else if (event->type == SDL_APP_WILLENTERBACKGROUND) { // SDL migration doc says this is needed.
+		drawing = false;
+		return 0;
+	} else if (event->type == SDL_APP_DIDENTERFOREGROUND) {
+		drawing = true;
 		return 0;
 	} else if (event->type == SDL_RENDER_DEVICE_RESET) {
 		on_render_device_reset(L);

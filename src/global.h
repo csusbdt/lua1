@@ -16,6 +16,7 @@ typedef int bool;
 #define false 0
 #define true 1
 
+extern bool drawing;
 extern SDL_Window   * window;
 extern SDL_Renderer * renderer;
 extern int window_width;

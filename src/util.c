@@ -79,6 +79,8 @@ static int set_window_position(lua_State * L) {
 static int draw_line(lua_State * L) {
 	int x1, y1, x2, y2;
 
+	if (!drawing) return 0;
+
 	x1 = luaL_checkinteger(L, 1);
 	y1 = luaL_checkinteger(L, 2);
 	x2 = luaL_checkinteger(L, 3);
@@ -91,6 +93,8 @@ static int draw_line(lua_State * L) {
 
 static int fill_rect(lua_State * L) {
 	SDL_Rect rect;
+
+	if (!drawing) return 0;
 
 	rect.x = luaL_checkinteger(L, 1);
 	rect.y = luaL_checkinteger(L, 2);
@@ -133,11 +137,13 @@ static int set_hint_render_scale_quality_linear(lua_State * L) {
 }
 
 static int render(lua_State * L) {
+	if (!drawing) return 0;
 	SDL_RenderPresent(renderer);
 	return 0;
 }
 
 static int render_clear(lua_State * L) {
+	if (!drawing) return 0;
 	SDL_RenderClear(renderer);
 	return 0;
 }

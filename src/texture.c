@@ -217,6 +217,8 @@ static int render_texture(lua_State * L) {
 	SDL_Rect src;
 	SDL_Rect dst;
 
+	if (!drawing) return 0;
+
 	// Check arguments.
 	numargs = lua_gettop(L);
 	if (numargs != 1 && numargs != 3 && numargs != 5 && numargs != 7 && numargs != 9) {
