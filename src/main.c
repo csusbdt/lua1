@@ -263,7 +263,7 @@ static void init() {
 		fatal(SDL_GetError());
 	}
 
-//	SDL_AddEventWatch(eventFilter, NULL);
+	SDL_AddEventWatch(eventFilter, NULL);
 
 	if (TTF_Init()) fatal(TTF_GetError());
 
