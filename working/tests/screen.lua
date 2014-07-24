@@ -23,6 +23,9 @@ local next_y
 local x = 0
 local y = 0
 
+local wave = wave_from_file("waves/Overworld.wav")
+local loop = loop_wave(wave)
+
 local function load_textures()
 --[[
 	main_texture, main_texture_w, main_texture_h 
@@ -93,6 +96,7 @@ function on_touch(mx, my)
 	x = mx
 	y = my
 	draw()
+	stop_loop(loop)
 end
 
 function on_keydown()

@@ -8,7 +8,13 @@
 	A play instance means the audio samples are rendered once; a loop instance
 	means the audio samples are rendered over and over.  A play instance comes
 	to a natural end; there is no way to terminate a play instance early. A
-	loop instance must be explicitly stopped.
+	loop instance however must be explicitly stopped.
+
+	Waves intended to be play instances SHOULD have fade-in and fade-out built
+	into their samples; this audio code does not fade play instances in or out.
+	Waves intended to be loops should NOT have fade in and fade out built into 
+	their samples; this audio code applies fade-in and fade-out to loops when
+	they are started and stopped.
 
 	Play instances are represented by instances of the PlayInstance struct.
 	Loop instances are represented by instances of the LoopInstance struct.
@@ -51,6 +57,9 @@
 #define MAX_AUDIO_SOURCES  4
 #define NO_INDEX          -1
 
+#define TRANSITION_MILLIS 50
+#define TRANSITION_SAMPLES (44.1 * TRANSITION_MILLIS)
+
 typedef Sint32 AudioSample;
 
 typedef struct {
@@ -67,6 +76,10 @@ typedef struct {
 typedef struct {
 	Wave * wave;
 	int    next_sample;
+	int    increasing_samples;  // how many increases in amplitude remaining after starting loop
+	int    decreasing_samples;  // how many decreases in amplitude remaining before removing loop
+	double delta_a;             // how much change in amplitude when decreasing or increasing
+	double a;                   // amplitude
 } LoopInstance;
 
 static SDL_AudioDeviceID dev;
@@ -106,6 +119,9 @@ static int fill_empty_loop_instance(Wave * wave) {
 		if (loop_instances[i].wave == NULL) {
 			loop_instances[i].wave = wave;
 			loop_instances[i].next_sample = 0;
+			loop_instances[i].increasing_samples = TRANSITION_SAMPLES;
+			loop_instances[i].delta_a = 1.0 / TRANSITION_SAMPLES;
+			loop_instances[i].a = 0.0;
 			++audio_sources;
 			++wave->refs;
 			return i;
@@ -136,6 +152,9 @@ static void reset_loop_instance(int i) {
 	release_wave(loop_instances[i].wave);
 	loop_instances[i].wave = NULL;
 	loop_instances[i].next_sample = 0;
+	loop_instances[i].increasing_samples = 0;
+	loop_instances[i].decreasing_samples = 0;
+	loop_instances[i].delta_a = 0;
 	SDL_assert(audio_sources > 0);
 	--audio_sources;
 }
@@ -160,7 +179,20 @@ static void render_loop_instance(int i, AudioSample * buf, int len) {
 	
 	wave = loop_instances[i].wave;
 	for (s = 0; s < len; ++s) {
-		buf[s] += wave->buf[loop_instances[i].next_sample++];
+		if (loop_instances[i].increasing_samples > 0) {
+			loop_instances[i].a += loop_instances[i].delta_a;
+			--loop_instances[i].increasing_samples;
+			if (loop_instances[i].a > 1) loop_instances[i].a = 1.0;
+		} else if (loop_instances[i].decreasing_samples > 0) {
+                        loop_instances[i].a -= loop_instances[i].delta_a;
+                        --loop_instances[i].decreasing_samples;
+			if (loop_instances[i].a <= 0) {
+				loop_instances[i].a = 0;
+				reset_loop_instance(i);
+				return;
+			}
+                }
+		buf[s] += loop_instances[i].a * wave->buf[loop_instances[i].next_sample++];
 		if (loop_instances[i].next_sample == wave->len) {
 			loop_instances[i].next_sample = 0;
 		}
@@ -352,7 +384,8 @@ static int stop_loop(lua_State * L) {
 
 	// Do it.
 	lock_audio();
-	reset_loop_instance(i);
+	loop_instances[i].decreasing_samples = TRANSITION_SAMPLES;
+	loop_instances[i].delta_a = 1.0 / TRANSITION_SAMPLES;
 	unlock_audio();
 	return 0;
 }
