@@ -75,7 +75,6 @@ function on_update()
 end
 
 function on_touch(mx, my)
---[[
 	if x >= next_x and 
 	   x <= next_x + next_texture_w and 
 	   y >= next_y and 
@@ -91,21 +90,34 @@ function on_touch(mx, my)
 		windowed()
 		app_fullscreen = false
 	end
---]]
--- msgbox("x, y = " .. mx .. "  " .. my)
 	x = mx
 	y = my
 	draw()
-	stop_loop(loop)
 end
 
-function on_keydown()
-	if not app_fullscreen then 
+local vol = 1
+
+function on_keydown(key)
+	if key == 100 then  -- d
+		vol = vol - .05
+		if vol < 0 then vol = 0 end
+		set_volume(vol)
+		return
+	elseif key == 117 then -- u
+		vol = vol + .05
+		if vol > 1 then vol = 1 end
+		set_volume(vol)
+		return
+	elseif key == 115 then -- s
+		stop_loop(loop)
+		return
+	elseif key == 102 then  -- f
+	--if not app_fullscreen then 
 		fullscreen()
-		app_fullscreen = true
-	else
+	--	app_fullscreen = true
+	elseif key == 119 then  -- w
 		windowed()
-		app_fullscreen = false
+	--	app_fullscreen = false
 	end
 end
 

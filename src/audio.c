@@ -85,6 +85,7 @@ typedef struct {
 static SDL_AudioDeviceID dev;
 static SDL_AudioSpec app_audio_spec;
 static int audio_sources = 0;
+static double vol = 1.0;
 
 static PlayInstance play_instances[MAX_AUDIO_SOURCES];
 static LoopInstance loop_instances[MAX_AUDIO_SOURCES];
@@ -165,7 +166,7 @@ static void render_play_instance(int i, AudioSample * buf, int len) {
 	
 	wave = play_instances[i].wave;
 	for (s = 0; s < len; ++s) {
-		buf[s] += wave->buf[play_instances[i].next_sample++];
+		buf[s] += vol * wave->buf[play_instances[i].next_sample++];
 		if (play_instances[i].next_sample == wave->len) {
 			reset_play_instance(i);
 			return;
@@ -192,7 +193,7 @@ static void render_loop_instance(int i, AudioSample * buf, int len) {
 				return;
 			}
                 }
-		buf[s] += loop_instances[i].a * wave->buf[loop_instances[i].next_sample++];
+		buf[s] += vol * loop_instances[i].a * wave->buf[loop_instances[i].next_sample++];
 		if (loop_instances[i].next_sample == wave->len) {
 			loop_instances[i].next_sample = 0;
 		}
@@ -390,6 +391,31 @@ static int stop_loop(lua_State * L) {
 	return 0;
 }
 
+static int set_volume(lua_State * L) {
+	double v;
+
+	// Check arguments.
+	if (lua_gettop(L) != 1) {
+		luaL_error(L, "wrong number of arguments passed to set_volume");
+	}
+	if (lua_type(L, 1) != LUA_TNUMBER) {
+		luaL_error(L, "Argument to set_volume should be a number.");
+	}
+	
+	// Extract arguments.
+	v = luaL_checknumber(L, 1);
+
+	if (v < 0 || v > 1) {
+		luaL_error(L, "Argument to set_volume should be between 0 and 1.");
+	}
+
+	// Do it.
+	lock_audio();
+	vol = v;
+	unlock_audio();
+	return 0;
+}
+
 static void render_sources(AudioSample * buf, int len) {
 	int i;
 	
@@ -447,5 +473,6 @@ void register_audio_functions(lua_State * L) {
 	lua_register(L, "play_wave"      , play_wave      );
 	lua_register(L, "loop_wave"      , loop_wave      );
 	lua_register(L, "stop_loop"      , stop_loop      );
+	lua_register(L, "set_volume"     , set_volume     );
 }
 
