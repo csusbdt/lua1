@@ -416,6 +416,18 @@ static int set_volume(lua_State * L) {
 	return 0;
 }
 
+static int get_volume(lua_State * L) {
+	// Check arguments.
+	if (lua_gettop(L) != 0) {
+		luaL_error(L, "get_volume takes no arguments.");
+	}
+	
+	// Do it.
+	lua_pushnumber(L, vol);
+	return 1;
+}
+
+
 static void render_sources(AudioSample * buf, int len) {
 	int i;
 	
@@ -474,5 +486,6 @@ void register_audio_functions(lua_State * L) {
 	lua_register(L, "loop_wave"      , loop_wave      );
 	lua_register(L, "stop_loop"      , stop_loop      );
 	lua_register(L, "set_volume"     , set_volume     );
+	lua_register(L, "get_volume"     , get_volume     );
 }
 
